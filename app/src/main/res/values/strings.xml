@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Carrier Pigeon 3</string>
+    <array name="tipos_usuario">
+        <item>maestro</item>
+        <item>padre</item>
+    </array>
+</resources>
