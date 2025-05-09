@@ -16,6 +16,7 @@ public class AdminMainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences; //nos permite guardar datos en el dispositivo para la sesión activa
     private SharedPreferences.Editor editor;
 
+    private Button botonParaSexo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
