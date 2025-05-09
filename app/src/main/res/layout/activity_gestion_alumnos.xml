@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edtAlumnoID"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="ID del Alumno" />
+
+    <EditText
+        android:id="@+id/edtNombreAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="Nombre del Alumno" />
+
+    <EditText
+        android:id="@+id/edtApellidoAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="Apellido del Alumno" />
+
+    <EditText
+        android:id="@+id/edtTelefonoAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="Teléfono del Alumno"
+    android:inputType="phone" />
+
+    <Button
+        android:id="@+id/btnRegistrarAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Registrar Alumno" />
+
+    <Button
+        android:id="@+id/btnActualizarAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Actualizar Alumno" />
+
+    <Button
+        android:id="@+id/btnEliminarAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Eliminar Alumno" />
+</LinearLayout>

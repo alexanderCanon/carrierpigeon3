@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edtAlumnoID"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="ID del Alumno" />
+
+    <EditText
+        android:id="@+id/edtMateria"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="Materia" />
+
+    <EditText
+        android:id="@+id/edtNota"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:hint="Nota"
+    android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btnRegistrarNota"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Registrar Nota" />
+
+    <Button
+        android:id="@+id/btnActualizarNota"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Actualizar Nota" />
+
+    <Button
+        android:id="@+id/btnEliminarNota"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+    android:text="Eliminar Nota" />
+</LinearLayout>
+
+
