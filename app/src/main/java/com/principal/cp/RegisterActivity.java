@@ -34,7 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Spinner spinnerTipoUsuario;
     private Button buttonRegister;
     private RequestQueue requestQueue;
-    private static final String URL_REGISTER = "http://34.173.185.235/registrar_usuario.php"; // Reemplaza
+    private static final String URL_REGISTER = "http://34.71.103.241/registrar_usuario.php"; // Reemplaza
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

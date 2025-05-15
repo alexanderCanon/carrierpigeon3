@@ -18,7 +18,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.principal.cp.maestros.MaestroMainActivity;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonLogin;
     private TextView textViewRegisterLink;
     private RequestQueue requestQueue;
-    private static final String URL_LOGIN = "http://34.173.185.235/login_usuario.php"; // Reemplaza
-
+    private static final String URL_LOGIN = "http://34.71.103.241/login_usuario.php"; // Reemplaza
+    private static final String TAG = "MainActivity";
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
@@ -78,6 +82,40 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
+
+        //FIREBASEMESSAGING PART
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Error al obtener el token", task.getException());
+                        return;
+                    }
+
+                    // Token obtenido
+                    String token = task.getResult();
+                    Log.d(TAG, "Token FCM: " + token);
+
+                    // Enviar el token al servidor
+                    new Thread(() -> {
+                        try {
+                            URL url = new URL("http://34.71.103.241/save_token.php"); // CAMBIA esto por tu URL real
+                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Content-Type", "application/json");
+                            conn.setDoOutput(true);
+
+                            String jsonInput = "{\"token\":\"" + token + "\"}";
+                            OutputStream os = conn.getOutputStream();
+                            os.write(jsonInput.getBytes("UTF-8"));
+                            os.close();
+
+                            int responseCode = conn.getResponseCode();
+                            Log.d(TAG, "Respuesta del servidor: " + responseCode);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                });
     }
 
     private void loginUser(final String email, final String password) {

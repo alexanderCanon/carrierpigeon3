@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "673667939251",
+    "project_id": "carrierpiegon3",
+    "storage_bucket": "carrierpiegon3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673667939251:android:7d9efba3888c6e2297a9c6",
+        "android_client_info": {
+          "package_name": "com.principal.cp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWUqLJhmdku3gr741XcU4Cfp-fEK9JqzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

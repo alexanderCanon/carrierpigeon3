@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private AnuncioAdapter anuncioAdapter;
     private List<AnuncioPrueba> listaAnuncios;
 
-    private static final String URL_ANUNCIOS = "http://34.173.185.235/obtener_anuncios_prueba.php";
+    private static final String URL_ANUNCIOS = "http://34.71.103.241/obtener_anuncios_prueba.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
