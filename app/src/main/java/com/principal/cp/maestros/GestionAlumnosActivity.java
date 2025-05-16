@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Button;
@@ -73,6 +74,14 @@ public class GestionAlumnosActivity extends AppCompatActivity {
             String data = "id=" + alumnoID;
             new EnviarDatosAlumnoTask("http://34.122.138.135/eliminar_alumno.php").execute(data);
         });
+
+        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
+        btnVolverMaestros.setOnClickListener(v -> {
+            Intent intent = new Intent(GestionAlumnosActivity.this, MaestroMainActivity.class);
+            startActivity(intent);
+            finish(); // opcional, para cerrar la activity actual
+        });
+
     }
 
     private class EnviarDatosAlumnoTask extends AsyncTask<String, Void, String> {

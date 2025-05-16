@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -54,6 +55,14 @@ public class GestionAsistenciaActivity extends AppCompatActivity {
 
             editarAsistencia(alumnoID, fecha, asistencia, observaciones);
         });
+
+        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
+        btnVolverMaestros.setOnClickListener(v -> {
+            Intent intent = new Intent(GestionAsistenciaActivity.this, MaestroMainActivity.class);
+            startActivity(intent);
+            finish(); // opcional, para cerrar la activity actual
+        });
+
 
     }
 

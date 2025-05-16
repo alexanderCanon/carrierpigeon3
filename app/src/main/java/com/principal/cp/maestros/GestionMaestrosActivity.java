@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -43,6 +44,13 @@ public class GestionMaestrosActivity extends AppCompatActivity {
                 Toast.makeText(GestionMaestrosActivity.this, "Función agregar pendiente", Toast.LENGTH_SHORT).show();
             }
         });
+        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
+        btnVolverMaestros.setOnClickListener(v -> {
+            Intent intent = new Intent(GestionMaestrosActivity.this, MaestroMainActivity.class);
+            startActivity(intent);
+            finish(); // opcional, para cerrar la activity actual
+        });
+
 
         obtenerMaestros();
     }

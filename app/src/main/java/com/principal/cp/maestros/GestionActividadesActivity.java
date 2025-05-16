@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -38,16 +39,17 @@ public class GestionActividadesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gestion_actividades);
+        setContentView(R.layout.activity_gestion_actividades); // ✅ PRIMERO
 
-        edtFechaEntrega.setFocusable(false);
-        edtFechaEntrega.setOnClickListener(v -> mostrarDateTimePicker());
+        // ✅ Luego inicializas todo
         edtActividadID = findViewById(R.id.edtActividadID);
         spinnerMateria = findViewById(R.id.spinnerMateria);
         edtTitulo = findViewById(R.id.edtTitulo);
         edtDescripcion = findViewById(R.id.edtDescripcion);
         spinnerTipo = findViewById(R.id.spinnerTipo);
         edtFechaEntrega = findViewById(R.id.edtFechaEntrega);
+        edtFechaEntrega.setFocusable(false);
+        edtFechaEntrega.setOnClickListener(v -> mostrarDateTimePicker());
         edtValorTotal = findViewById(R.id.edtValorTotal);
         edtGrado = findViewById(R.id.edtGrado);
         edtSeccion = findViewById(R.id.edtSeccion);
@@ -80,6 +82,14 @@ public class GestionActividadesActivity extends AppCompatActivity {
             String data = "id_actividad=" + id;
             new ActividadTask("http://34.122.138.135/eliminar_actividad.php").execute(data);
         });
+
+        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
+        btnVolverMaestros.setOnClickListener(v -> {
+            Intent intent = new Intent(GestionActividadesActivity.this, MaestroMainActivity.class);
+            startActivity(intent);
+            finish(); // opcional, para cerrar la activity actual
+        });
+
     }
 
     private String getActividadData(boolean incluirID) {

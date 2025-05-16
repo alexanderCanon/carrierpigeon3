@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -37,28 +38,35 @@ public class GestionNotasActivity extends AppCompatActivity {
         // Registrar una nueva nota
         btnRegistrarNota.setOnClickListener(v -> {
             String alumnoID = edtAlumnoID.getText().toString();
-            String materia = edtActividadID.getText().toString();
+            String actividad = edtActividadID.getText().toString();
             String nota = edtNota.getText().toString();
 
-            registrarNota(alumnoID, materia, nota);
+            registrarNota(alumnoID, actividad, nota);
         });
 
         // Actualizar una nota existente
         btnActualizarNota.setOnClickListener(v -> {
             String alumnoID = edtAlumnoID.getText().toString();
-            String materia = edtActividadID.getText().toString();
+            String actividad = edtActividadID.getText().toString();
             String nota = edtNota.getText().toString();
 
-            actualizarNota(alumnoID, materia, nota);
+            actualizarNota(alumnoID, actividad, nota);
         });
 
         // Eliminar una nota
         btnEliminarNota.setOnClickListener(v -> {
             String alumnoID = edtAlumnoID.getText().toString();
-            String materia = edtActividadID.getText().toString();
+            String actividad = edtActividadID.getText().toString();
 
-            eliminarNota(alumnoID, materia);
+            eliminarNota(alumnoID, actividad);
         });
+        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
+        btnVolverMaestros.setOnClickListener(v -> {
+            Intent intent = new Intent(GestionNotasActivity.this, MaestroMainActivity.class);
+            startActivity(intent);
+            finish(); // opcional, para cerrar la activity actual
+        });
+
     }
 
     private void registrarNota(String alumnoID, String actividadID, String nota) {

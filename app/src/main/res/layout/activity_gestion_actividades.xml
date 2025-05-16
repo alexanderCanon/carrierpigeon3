@@ -96,6 +96,13 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="Eliminar Actividad" />
+        <Button
+            android:id="@+id/btnVolverMaestros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver a menú de maestro"
+            android:layout_marginTop="16dp" />
+
     </LinearLayout>
 </ScrollView>
 
