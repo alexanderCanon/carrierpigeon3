@@ -1,34 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/edtTituloActividad"
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="Título de la Actividad"
-    android:inputType="text" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/edtDescripcionActividad"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="Descripción"
-    android:inputType="text" />
+        <!-- ID Actividad (para editar/eliminar) -->
+        <EditText
+            android:id="@+id/edtActividadID"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="ID Actividad"
+            android:inputType="number" />
 
-    <EditText
-        android:id="@+id/edtFechaActividad"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="Fecha (YYYY-MM-DD)"
-    android:inputType="date" />
+        <Spinner
+            android:id="@+id/spinnerMateria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
 
-    <Button
-        android:id="@+id/btnRegistrarActividad"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:text="Registrar Actividad" />
-</LinearLayout>
+
+        <EditText
+            android:id="@+id/edtTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Título de la Actividad"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Descripción"
+            android:inputType="text" />
+
+        <Spinner
+            android:id="@+id/spinnerTipo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+
+        <EditText
+            android:id="@+id/edtFechaEntrega"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Fecha de Entrega (YYYY-MM-DD HH:MM:SS)"
+            android:inputType="datetime" />
+
+        <EditText
+            android:id="@+id/edtValorTotal"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Valor Total"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/edtGrado"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Grado"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtSeccion"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Sección"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtIdMaestro"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="ID Maestro"
+            android:inputType="number" />
+
+        <!-- Botones -->
+        <Button
+            android:id="@+id/btnRegistrarActividad"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Registrar Actividad" />
+
+        <Button
+            android:id="@+id/btnEditarActividad"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Editar Actividad" />
+
+        <Button
+            android:id="@+id/btnEliminarActividad"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Eliminar Actividad" />
+    </LinearLayout>
+</ScrollView>
+

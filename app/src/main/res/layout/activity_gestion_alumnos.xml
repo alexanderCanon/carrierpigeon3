@@ -18,6 +18,24 @@
     android:hint="Nombre del Alumno" />
 
     <EditText
+        android:id="@+id/edtEmailAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Email del Alumno" />
+
+    <EditText
+        android:id="@+id/edtGradoAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Grado del Alumno" />
+
+    <EditText
+        android:id="@+id/edtSeccionAlumno"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Seccion del Alumno" />
+
+    <EditText
         android:id="@+id/edtApellidoAlumno"
         android:layout_width="match_parent"
         android:layout_height="48dp"

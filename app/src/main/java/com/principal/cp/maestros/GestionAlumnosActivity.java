@@ -1,7 +1,7 @@
 package com.principal.cp.maestros;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -10,9 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.principal.cp.R;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class GestionAlumnosActivity extends AppCompatActivity {
 
     private EditText edtAlumnoID, edtNombreAlumno, edtApellidoAlumno, edtTelefonoAlumno;
+    private EditText edtEmailAlumno, edtGradoAlumno, edtSeccionAlumno;
     private Button btnRegistrarAlumno, btnActualizarAlumno, btnEliminarAlumno;
 
     @Override
@@ -24,48 +31,89 @@ public class GestionAlumnosActivity extends AppCompatActivity {
         edtNombreAlumno = findViewById(R.id.edtNombreAlumno);
         edtApellidoAlumno = findViewById(R.id.edtApellidoAlumno);
         edtTelefonoAlumno = findViewById(R.id.edtTelefonoAlumno);
+        edtEmailAlumno = findViewById(R.id.edtEmailAlumno);
+        edtGradoAlumno = findViewById(R.id.edtGradoAlumno);
+        edtSeccionAlumno = findViewById(R.id.edtSeccionAlumno);
+
         btnRegistrarAlumno = findViewById(R.id.btnRegistrarAlumno);
         btnActualizarAlumno = findViewById(R.id.btnActualizarAlumno);
         btnEliminarAlumno = findViewById(R.id.btnEliminarAlumno);
 
-        // Registrar un nuevo alumno
         btnRegistrarAlumno.setOnClickListener(v -> {
             String nombre = edtNombreAlumno.getText().toString();
             String apellido = edtApellidoAlumno.getText().toString();
             String telefono = edtTelefonoAlumno.getText().toString();
+            String email = edtEmailAlumno.getText().toString();
+            String grado = edtGradoAlumno.getText().toString();
+            String seccion = edtSeccionAlumno.getText().toString();
 
-            registrarAlumno(nombre, apellido, telefono);
+            String data = "nombre=" + nombre + "&apellido=" + apellido + "&telefono=" + telefono +
+                    "&email=" + email + "&grado=" + grado + "&seccion=" + seccion;
+
+            new EnviarDatosAlumnoTask("http://34.122.138.135/registrar_alumno.php").execute(data);
         });
 
-        // Actualizar información de un alumno
         btnActualizarAlumno.setOnClickListener(v -> {
             String alumnoID = edtAlumnoID.getText().toString();
             String nombre = edtNombreAlumno.getText().toString();
             String apellido = edtApellidoAlumno.getText().toString();
             String telefono = edtTelefonoAlumno.getText().toString();
+            String email = edtEmailAlumno.getText().toString();
+            String grado = edtGradoAlumno.getText().toString();
+            String seccion = edtSeccionAlumno.getText().toString();
 
-            actualizarAlumno(alumnoID, nombre, apellido, telefono);
+            String data = "id=" + alumnoID + "&nombre=" + nombre + "&apellido=" + apellido +
+                    "&telefono=" + telefono + "&email=" + email + "&grado=" + grado + "&seccion=" + seccion;
+
+            new EnviarDatosAlumnoTask("http://34.122.138.135/actualizar_alumno.php").execute(data);
         });
 
-        // Eliminar un alumno
         btnEliminarAlumno.setOnClickListener(v -> {
             String alumnoID = edtAlumnoID.getText().toString();
-            eliminarAlumno(alumnoID);
+            String data = "id=" + alumnoID;
+            new EnviarDatosAlumnoTask("http://34.122.138.135/eliminar_alumno.php").execute(data);
         });
     }
 
-    private void registrarAlumno(String nombre, String apellido, String telefono) {
-        // Aquí iría la lógica para enviar los datos al servidor PHP (utilizando AsyncTask, Retrofit o alguna otra librería)
-        Toast.makeText(this, "Alumno registrado: " + nombre, Toast.LENGTH_SHORT).show();
-    }
+    private class EnviarDatosAlumnoTask extends AsyncTask<String, Void, String> {
+        private final String url;
 
-    private void actualizarAlumno(String alumnoID, String nombre, String apellido, String telefono) {
-        // Aquí iría la lógica para actualizar el alumno en la base de datos a través de PHP
-        Toast.makeText(this, "Alumno actualizado: " + nombre, Toast.LENGTH_SHORT).show();
-    }
+        public EnviarDatosAlumnoTask(String url) {
+            this.url = url;
+        }
 
-    private void eliminarAlumno(String alumnoID) {
-        // Aquí iría la lógica para eliminar el alumno en la base de datos a través de PHP
-        Toast.makeText(this, "Alumno eliminado", Toast.LENGTH_SHORT).show();
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL(this.url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+                writer.write(params[0]);
+                writer.flush();
+                writer.close();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                reader.close();
+                return result.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error de conexión";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(GestionAlumnosActivity.this, result, Toast.LENGTH_LONG).show();
+        }
     }
 }
