@@ -12,10 +12,10 @@
     android:hint="ID del Alumno" />
 
     <EditText
-        android:id="@+id/edtMateria"
+        android:id="@+id/edtActividadID"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-    android:hint="Materia" />
+    android:hint="ID Actividad" />
 
     <EditText
         android:id="@+id/edtNota"
@@ -23,6 +23,13 @@
         android:layout_height="48dp"
     android:hint="Nota"
     android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/edtObservaciones"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Observaciones"
+        android:inputType="numberDecimal" />
 
     <Button
         android:id="@+id/btnRegistrarNota"
@@ -41,6 +48,13 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
     android:text="Eliminar Nota" />
+    <Button
+        android:id="@+id/btnVolverMaestros"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver a menú de maestro"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>
 
 

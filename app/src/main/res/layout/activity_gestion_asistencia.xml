@@ -13,6 +13,14 @@
     android:inputType="number" />
 
     <EditText
+        android:id="@+id/edtObservaciones"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:inputType="number"
+        android:hint="Observaciones"/>
+
+
+    <EditText
         android:id="@+id/edtFecha"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -27,9 +35,23 @@
     android:inputType="text" />
 
     <Button
+        android:id="@+id/btnEditarAsistencia"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Editar Asistencia" />
+    <Button
         android:id="@+id/btnRegistrarAsistencia"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-    android:text="Registrar Asistencia" />
+        android:text="Registrar Asistencia" />
+    <Button
+        android:id="@+id/btnVolverMaestros"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver a menú de maestro"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>
+
+
 
