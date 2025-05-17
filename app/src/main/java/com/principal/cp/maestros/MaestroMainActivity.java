@@ -25,13 +25,13 @@ public class MaestroMainActivity extends AppCompatActivity {
         btnActividades = findViewById(R.id.btnActividades);
 
         // Evento de click para cada botón
-        btnAlumnos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MaestroMainActivity.this, GestionAlumnosActivity.class);
-                startActivity(intent);
-            }
-        });
+//        btnAlumnos.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MaestroMainActivity.this, GestionAlumnosActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         btnNotas.setOnClickListener(new View.OnClickListener() {
             @Override
