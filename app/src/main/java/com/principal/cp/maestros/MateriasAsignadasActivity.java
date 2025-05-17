@@ -2,6 +2,8 @@ package com.principal.cp.maestros;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -50,6 +52,35 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         cargarMaterias();
+
+        Button btnMenuOpciones = findViewById(R.id.btnMenuOpciones);
+
+        btnMenuOpciones.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(MateriasAsignadasActivity.this, btnMenuOpciones);
+            popup.getMenuInflater().inflate(R.menu.menu_maestro, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_volver_materias) {
+                    startActivity(new Intent(this, MateriasAsignadasActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_actividades) {
+                    startActivity(new Intent(this, GestionActividadesActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_asistencia) {
+                    startActivity(new Intent(this, GestionAsistenciaActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_notas) {
+                    startActivity(new Intent(this, GestionNotasActivity.class));
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            popup.show();
+        });
+
     }
     private void cargarMaterias() {
         new Thread(() -> {

@@ -1,16 +1,20 @@
 package com.principal.cp.maestros;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.principal.cp.R;
 
@@ -25,7 +29,13 @@ import java.net.URLEncoder;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class GestionActividadesActivity extends AppCompatActivity {
@@ -53,7 +63,6 @@ public class GestionActividadesActivity extends AppCompatActivity {
         edtValorTotal = findViewById(R.id.edtValorTotal);
         edtGrado = findViewById(R.id.edtGrado);
         edtSeccion = findViewById(R.id.edtSeccion);
-        edtIdMaestro = findViewById(R.id.edtIdMaestro);
 
         Spinner spinnerTipo = findViewById(R.id.spinnerTipo);
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(this,
@@ -83,23 +92,50 @@ public class GestionActividadesActivity extends AppCompatActivity {
             new ActividadTask("http://34.122.138.135/eliminar_actividad.php").execute(data);
         });
 
-        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
-        btnVolverMaestros.setOnClickListener(v -> {
-            Intent intent = new Intent(GestionActividadesActivity.this, MaestroMainActivity.class);
-            startActivity(intent);
-            finish(); // opcional, para cerrar la activity actual
+        Button btnMenuOpciones = findViewById(R.id.btnMenuOpciones);
+
+        btnMenuOpciones.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(GestionActividadesActivity.this, btnMenuOpciones);
+            popup.getMenuInflater().inflate(R.menu.menu_maestro, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_volver_materias) {
+                    startActivity(new Intent(this, MateriasAsignadasActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_actividades) {
+                    startActivity(new Intent(this, GestionActividadesActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_asistencia) {
+                    startActivity(new Intent(this, GestionAsistenciaActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_notas) {
+                    startActivity(new Intent(this, GestionNotasActivity.class));
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            popup.show();
         });
+
+        RecyclerView recyclerActividades = findViewById(R.id.recyclerActividades);
+        recyclerActividades.setLayoutManager(new LinearLayoutManager(this));
+        cargarActividadesEnProgreso(recyclerActividades);
+
 
     }
 
     private String getActividadData(boolean incluirID) {
         try {
-            // Obtener tipo desde Spinner
             String tipo = spinnerTipo.getSelectedItem().toString();
-
-            // Obtener materia seleccionada desde Spinner
             Materia materiaSeleccionada = (Materia) spinnerMateria.getSelectedItem();
             int idMateria = materiaSeleccionada.id_materia;
+
+            // ✅ Obtener el ID del maestro desde SharedPreferences
+            SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            int idMaestro = prefs.getInt("user_id", -1);
 
             StringBuilder data = new StringBuilder();
 
@@ -115,7 +151,8 @@ public class GestionActividadesActivity extends AppCompatActivity {
             data.append("valor_total=").append(URLEncoder.encode(edtValorTotal.getText().toString(), "UTF-8")).append("&");
             data.append("grado=").append(URLEncoder.encode(edtGrado.getText().toString(), "UTF-8")).append("&");
             data.append("seccion=").append(URLEncoder.encode(edtSeccion.getText().toString(), "UTF-8")).append("&");
-            data.append("id_usuario_maestro=").append(URLEncoder.encode(edtIdMaestro.getText().toString(), "UTF-8"));
+            data.append("id_usuario_maestro=").append(URLEncoder.encode(String.valueOf(idMaestro), "UTF-8"));
+
 
             return data.toString();
         } catch (Exception e) {
@@ -123,6 +160,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
             return "";
         }
     }
+
 
 
 
@@ -146,6 +184,65 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
+
+    private void cargarActividadesEnProgreso(RecyclerView recyclerView) {
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        int idMaestro = prefs.getInt("user_id", -1);
+
+        String url = "http://34.122.138.135/listar_actividades_en_progreso.php?id_usuario_maestro=" + idMaestro;
+
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    URL link = new URL(url);
+                    HttpURLConnection conn = (HttpURLConnection) link.openConnection();
+                    conn.setRequestMethod("GET");
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    reader.close();
+                    return result.toString();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String json) {
+                if (json != null) {
+                    try {
+                        JSONObject obj = new JSONObject(json);
+                        if (!obj.getBoolean("error")) {
+                            JSONArray arr = obj.getJSONArray("actividades");
+                            List<Actividad> actividades = new ArrayList<>();
+                            for (int i = 0; i < arr.length(); i++) {
+                                JSONObject item = arr.getJSONObject(i);
+                                Actividad a = new Actividad();
+                                a.id_actividad = item.getInt("id_actividad");
+                                a.titulo = item.getString("titulo");
+                                a.fecha_entrega = item.getString("fecha_entrega");
+                                a.tipo = item.getString("tipo");
+                                actividades.add(a);
+                            }
+                            recyclerView.setAdapter(new ActividadAdapter(actividades));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.execute();
+    }
+
 
 
     private class ActividadTask extends AsyncTask<String, Void, String> {

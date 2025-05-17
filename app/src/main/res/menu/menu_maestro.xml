@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_volver_materias"
+        android:title="Volver a Menú Principal" />
+
+    <item
+        android:id="@+id/menu_actividades"
+        android:title="Gestionar Actividades" />
+    <item
+        android:id="@+id/menu_asistencia"
+        android:title="Gestionar Asistencia" />
+    <item
+        android:id="@+id/menu_notas"
+        android:title="Gestionar Notas" />
+</menu>
+

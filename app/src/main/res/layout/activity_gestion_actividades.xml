@@ -9,6 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <Button
+            android:id="@+id/btnMenuOpciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="☰"
+            android:layout_margin="16dp" />
+
         <!-- ID Actividad (para editar/eliminar) -->
         <EditText
             android:id="@+id/edtActividadID"
@@ -71,13 +78,6 @@
             android:hint="Sección"
             android:inputType="text" />
 
-        <EditText
-            android:id="@+id/edtIdMaestro"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="ID Maestro"
-            android:inputType="number" />
-
         <!-- Botones -->
         <Button
             android:id="@+id/btnRegistrarActividad"
@@ -96,12 +96,14 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="Eliminar Actividad" />
-        <Button
-            android:id="@+id/btnVolverMaestros"
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerActividades"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Volver a menú de maestro"
             android:layout_marginTop="16dp" />
+
+
 
     </LinearLayout>
 </ScrollView>

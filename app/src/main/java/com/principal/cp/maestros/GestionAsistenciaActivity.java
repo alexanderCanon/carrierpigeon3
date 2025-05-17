@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,11 +57,34 @@ public class GestionAsistenciaActivity extends AppCompatActivity {
             editarAsistencia(alumnoID, fecha, asistencia, observaciones);
         });
 
-        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
-        btnVolverMaestros.setOnClickListener(v -> {
-            Intent intent = new Intent(GestionAsistenciaActivity.this, MaestroMainActivity.class);
-            startActivity(intent);
-            finish(); // opcional, para cerrar la activity actual
+
+
+        Button btnMenuOpciones = findViewById(R.id.btnMenuOpciones);
+
+        btnMenuOpciones.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(GestionAsistenciaActivity.this, btnMenuOpciones);
+            popup.getMenuInflater().inflate(R.menu.menu_maestro, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_volver_materias) {
+                    startActivity(new Intent(this, MateriasAsignadasActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_actividades) {
+                    startActivity(new Intent(this, GestionActividadesActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_asistencia) {
+                    startActivity(new Intent(this, GestionAsistenciaActivity.class));
+                    return true;
+                } else if (itemId == R.id.menu_notas) {
+                    startActivity(new Intent(this, GestionNotasActivity.class));
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            popup.show();
         });
 
 
