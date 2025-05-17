@@ -19,6 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.principal.cp.maestros.MaestroMainActivity;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.principal.cp.maestros.MateriasAsignadasActivity;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import director.DirectorMainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -126,7 +129,15 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("LoginActivity", "Response: " + response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+
                             if (!jsonObject.getBoolean("error")) {
+                                String tipo_usuario = jsonObject.getString("tipo_usuario");
+                                int idUsuario = jsonObject.getInt("id_usuario");
+                                SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("id_usuario", String.valueOf(idUsuario)); // guardamos como string por compatibilidad
+                                editor.apply();
+
                                 Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
 
                                 // Guardar información del usuario en SharedPreferences
@@ -145,10 +156,14 @@ public class LoginActivity extends AppCompatActivity {
                                         intent = new Intent(LoginActivity.this, AdminMainActivity.class);
                                         break;
                                     case "maestro":
-                                        intent = new Intent(LoginActivity.this, MaestroMainActivity.class);
+                                        intent = new Intent(LoginActivity.this, MateriasAsignadasActivity.class);
+                                        intent.putExtra("id_usuario", idUsuario); // este viene de la base de datos
                                         break;
                                     case "padre":
                                         intent = new Intent(LoginActivity.this, PadreMainActivity.class);
+                                        break;
+                                    case "director":
+                                        intent = new Intent(LoginActivity.this, DirectorMainActivity.class);
                                         break;
                                     default:
                                         intent = new Intent(LoginActivity.this, MainActivity.class); // Fallback

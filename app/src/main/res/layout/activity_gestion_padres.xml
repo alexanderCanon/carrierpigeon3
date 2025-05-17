@@ -6,20 +6,14 @@
     android:layout_height="match_parent">
 
     <WebView
-        android:id="@+id/webviewMaestros"
+        android:id="@+id/webviewPadres"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+    <Button
+        android:id="@+id/btnAgregarPadre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agregar Padre" />
 
-    <Button
-        android:id="@+id/btnAgregarMaestro"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Agregar Maestro" />
-    <Button
-        android:id="@+id/btnAsignarMateria"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Asignar Materia a Maestro"
-        android:layout_marginBottom="8dp" />
 </LinearLayout>
