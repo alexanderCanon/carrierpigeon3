@@ -1,8 +1,10 @@
 package com.principal.cp;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +32,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import director.DirectorMainActivity;
@@ -38,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword;
     private Button buttonLogin;
-    private TextView textViewRegisterLink;
+    private TextView textViewForgotPass;
     private RequestQueue requestQueue;
     private static final String URL_LOGIN = "http://34.71.103.241/login_usuario.php"; // Reemplaza
     private static final String TAG = "MainActivity";
@@ -53,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextEmail = findViewById(R.id.editTextEmailLogin);
         editTextPassword = findViewById(R.id.editTextPasswordLogin);
         buttonLogin = findViewById(R.id.buttonLogin);
-        textViewRegisterLink = findViewById(R.id.textViewRegisterLink);
+        textViewForgotPass = findViewById(R.id.textViewRegisterLink);
         requestQueue = Volley.newRequestQueue(this);
         sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -79,10 +82,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        textViewRegisterLink.setOnClickListener(new View.OnClickListener() {
+        textViewForgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                mostrarDialogoRecuperacion(); // por ejemplo
+                //startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
 
@@ -204,5 +208,66 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void mostrarDialogoRecuperacion() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Recuperar contraseña");
+
+        final EditText inputEmail = new EditText(this);
+        inputEmail.setHint("Ingresa tu correo electrónico");
+        inputEmail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        builder.setView(inputEmail);
+
+        builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String email = inputEmail.getText().toString().trim();
+                if (!email.isEmpty()) {
+                    enviarSolicitudRecuperacion(email);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Ingresa un correo válido", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", null);
+
+        builder.show();
+    }
+
+    private void enviarSolicitudRecuperacion(String email) {
+        String url = "http://34.71.103.241/recuperar_contrasena.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        String status = jsonObject.getString("status");
+                        String message = jsonObject.getString("message");
+                        if (status.equals("ok")) {
+                            Toast.makeText(getApplicationContext(), "Correo de recuperación enviado", Toast.LENGTH_LONG).show();
+                        } else if (status.equals("not_found")) {
+                            Toast.makeText(getApplicationContext(), "Este correo no está registrado", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
+                        }
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(getApplicationContext(), "Error de red", Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("email", email);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
 
 }
