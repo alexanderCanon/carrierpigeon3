@@ -11,7 +11,7 @@ public class Materia {
         this.nombre = nombre;
         this.grado = grado;
         this.seccion = seccion;
-        }
+    }
     //@Override
     //public String toString() {
        // return nombre; // Esto es lo que se mostrará en el Spinner
