@@ -30,7 +30,7 @@ public class GestionMaestrosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion_maestros);
 
-        recyclerMaestros = findViewById(R.id.recyclerMaestros);
+        recyclerMaestros = findViewById(R.id.recyclerAlumnos);
         recyclerMaestros.setLayoutManager(new LinearLayoutManager(this));
 
         listaMaestros = new ArrayList<>();
