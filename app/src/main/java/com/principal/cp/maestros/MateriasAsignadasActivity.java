@@ -1,14 +1,18 @@
 package com.principal.cp.maestros;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.principal.cp.R;
 
 import org.json.JSONArray;
@@ -35,7 +39,35 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_materias_asignadas);
 
-        idUsuario = getIntent().getIntExtra("id_usuario", -1);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_materias);
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_materias) {
+                    return true;
+                } else if (id == R.id.nav_actividades) {
+                    startActivity(new Intent(MateriasAsignadasActivity.this, GestionActividadesActivity.class));
+                    return true;
+                } else if (id == R.id.nav_notas) {
+                    startActivity(new Intent(MateriasAsignadasActivity.this, GestionNotasActivity.class));
+                    return true;
+                } else if (id == R.id.nav_asistencia) {
+                    startActivity(new Intent(MateriasAsignadasActivity.this, GestionAsistenciaActivity.class));
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        idUsuario = prefs.getInt("id_usuario", -1);
+
 
         recyclerView = findViewById(R.id.recyclerMaterias);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -1,6 +1,7 @@
 package com.principal.cp.maestros;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.principal.cp.R;
 
 import java.io.BufferedReader;
@@ -25,7 +27,13 @@ import java.net.URLEncoder;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class GestionActividadesActivity extends AppCompatActivity {
@@ -34,6 +42,9 @@ public class GestionActividadesActivity extends AppCompatActivity {
             edtFechaEntrega, edtValorTotal, edtGrado, edtSeccion, edtIdMaestro;
     private Button btnRegistrarActividad, btnEditarActividad, btnEliminarActividad;
     private Spinner spinnerTipo, spinnerMateria;
+    private List<Materia> listaMaterias = new ArrayList<>();
+
+    private int idUsuario;
 
 
     @Override
@@ -41,9 +52,15 @@ public class GestionActividadesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion_actividades); // ✅ PRIMERO
 
+
         // ✅ Luego inicializas todo
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        idUsuario = prefs.getInt("id_usuario", -1);
+
+
         edtActividadID = findViewById(R.id.edtActividadID);
         spinnerMateria = findViewById(R.id.spinnerMateria);
+        cargarMaterias();
         edtTitulo = findViewById(R.id.edtTitulo);
         edtDescripcion = findViewById(R.id.edtDescripcion);
         spinnerTipo = findViewById(R.id.spinnerTipo);
@@ -61,6 +78,29 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 new String[]{"tarea", "examen", "proyecto", "otro"});
         adapterTipo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTipo.setAdapter(adapterTipo);
+
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_actividades);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_materias) {
+                Intent intent = new Intent(GestionActividadesActivity.this, MateriasAsignadasActivity.class);
+                intent.putExtra("id_usuario", idUsuario); // 👈 muy importante
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_actividades) {
+                return true;
+            } else if (id == R.id.nav_notas) {
+                startActivity(new Intent(GestionActividadesActivity.this, GestionNotasActivity.class));
+                return true;
+            } else if (id == R.id.nav_asistencia) {
+                startActivity(new Intent(GestionActividadesActivity.this, GestionAsistenciaActivity.class));
+                return true;
+            }
+            return false;
+        });
 
 
         btnRegistrarActividad = findViewById(R.id.btnRegistrarActividad);
@@ -83,12 +123,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
             new ActividadTask("http://34.122.138.135/eliminar_actividad.php").execute(data);
         });
 
-        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
-        btnVolverMaestros.setOnClickListener(v -> {
-            Intent intent = new Intent(GestionActividadesActivity.this, MaestroMainActivity.class);
-            startActivity(intent);
-            finish(); // opcional, para cerrar la activity actual
-        });
+
 
     }
 
@@ -99,7 +134,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
             // Obtener materia seleccionada desde Spinner
             Materia materiaSeleccionada = (Materia) spinnerMateria.getSelectedItem();
-            int idMateria = materiaSeleccionada.id_materia;
+            int idAsignacion = materiaSeleccionada.id_asignacion;
 
             StringBuilder data = new StringBuilder();
 
@@ -107,7 +142,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 data.append("id_actividad=").append(URLEncoder.encode(edtActividadID.getText().toString(), "UTF-8")).append("&");
             }
 
-            data.append("id_materia=").append(URLEncoder.encode(String.valueOf(idMateria), "UTF-8")).append("&");
+            data.append("id_asignacion=").append(URLEncoder.encode(String.valueOf(idAsignacion), "UTF-8")).append("&");
             data.append("titulo=").append(URLEncoder.encode(edtTitulo.getText().toString(), "UTF-8")).append("&");
             data.append("descripcion=").append(URLEncoder.encode(edtDescripcion.getText().toString(), "UTF-8")).append("&");
             data.append("tipo=").append(URLEncoder.encode(tipo, "UTF-8")).append("&");
@@ -195,5 +230,48 @@ public class GestionActividadesActivity extends AppCompatActivity {
             Toast.makeText(GestionActividadesActivity.this, resultado, Toast.LENGTH_LONG).show();
         }
     }
+    private void cargarMaterias() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.71.103.241/maestros/api_materias/materias_asignadas_html.php?id_usuario=" + idUsuario);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JSONArray jsonArray = new JSONArray(result.toString());
+                listaMaterias.clear();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    listaMaterias.add(new Materia(
+                            obj.getInt("id_asignacion"),  // ✅ CORRECTO
+                            obj.getString("nombre"),
+                            obj.getString("grado"),
+                            obj.getString("seccion")
+                    ));
+
+                }
+
+                runOnUiThread(() -> {
+                    ArrayAdapter<Materia> adapter = new ArrayAdapter<>(GestionActividadesActivity.this,
+                            android.R.layout.simple_spinner_item, listaMaterias);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerMateria.setAdapter(adapter);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error al cargar materias", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
 }
 

@@ -137,10 +137,8 @@ public class LoginActivity extends AppCompatActivity {
                             if (!jsonObject.getBoolean("error")) {
                                 String tipo_usuario = jsonObject.getString("tipo_usuario");
                                 int idUsuario = jsonObject.getInt("id_usuario");
-                                SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString("id_usuario", String.valueOf(idUsuario)); // guardamos como string por compatibilidad
-                                editor.apply();
+                                SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+                                prefs.edit().putInt("id_usuario", idUsuario).apply();
 
                                 Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
 
