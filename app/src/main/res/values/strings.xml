@@ -4,4 +4,8 @@
         <item>maestro</item>
         <item>padre</item>
     </array>
+    <string-array name="estado_filtro">
+        <item>activo</item>
+        <item>inactivo</item>
+    </string-array>
 </resources>

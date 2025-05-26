@@ -37,8 +37,6 @@ import java.util.Map;
 public class GestionAlumnosActivity extends AppCompatActivity {
     private EditText edtGrado, edtSeccion;
     private Button btnBuscar, btnAgregarAlumno;
-    private WebView webViewAlumnos;
-
     private List<Alumno> listaAlumnos;
     private AlumnoAdapter adapter;
     @Override
@@ -149,19 +147,28 @@ public class GestionAlumnosActivity extends AppCompatActivity {
 
     } // Fin onCreate
 
-    private void mostrarDialogoAgregar() {
+    private void mostrarDialogoAgregar() { //agrega alumnos
         AlertDialog.Builder builder = new AlertDialog.Builder(GestionAlumnosActivity.this);
         builder.setTitle("Agregar Nuevo Alumno");
 
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_agregar_alumno, null);
         builder.setView(view);
 
+        // Campos de alumno
         EditText nombre = view.findViewById(R.id.editNombre);
         EditText apellido = view.findViewById(R.id.editApellido);
         EditText fecha = view.findViewById(R.id.editFecha);
+        EditText direccion = view.findViewById(R.id.editDireccion);
+        EditText telefono = view.findViewById(R.id.editTelefono);
+        EditText email = view.findViewById(R.id.editEmail);
+        EditText grado = view.findViewById(R.id.editGrado);
+        EditText seccion = view.findViewById(R.id.editSeccion);
+        Spinner spinnerPadres = view.findViewById(R.id.spinnerPadres);
+
+        // Activar DatePicker en campo de fecha
         fecha.setFocusable(false);
         fecha.setOnClickListener(v1 -> {
-            Calendar calendar = Calendar.getInstance(); //Mucho ojo con esto
+            Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
             int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -173,50 +180,180 @@ public class GestionAlumnosActivity extends AppCompatActivity {
 
             datePicker.show();
         });
-        EditText direccion = view.findViewById(R.id.editDireccion);
-        EditText telefono = view.findViewById(R.id.editTelefono);
-        EditText email = view.findViewById(R.id.editEmail);
-        EditText grado = view.findViewById(R.id.editGrado);
-        EditText seccion = view.findViewById(R.id.editSeccion);
-        EditText padreId = view.findViewById(R.id.editPadreID);
 
-        builder.setPositiveButton("Guardar", null); // Se asignará luego manualmente
+        // Cargar padres en Spinner
+        final List<Padre> listaPadres = new ArrayList<>();
+        listaPadres.add(new Padre(-1, "Seleccione un padre...")); // Opción inicial
 
+        final ArrayAdapter<Padre> adapterPadres = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, listaPadres);
+        adapterPadres.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPadres.setAdapter(adapterPadres);
+
+        // Petición a servidor
+        String urlPadres = "http://34.71.103.241/listar_padres_activos.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, urlPadres, null,
+                response -> {
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject padreObj = response.getJSONObject(i);
+                            int id = padreObj.getInt("id_usuario");
+                            String nombrePadre = padreObj.getString("nombre") + " " + padreObj.getString("apellido");
+                            listaPadres.add(new Padre(id, nombrePadre));
+                        }
+                        listaPadres.add(new Padre(-99, "➕ Registrar nuevo padre")); // Opción al final
+                        adapterPadres.notifyDataSetChanged();
+                    } catch (JSONException e) {
+                        Toast.makeText(this, "Error procesando padres", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(this, "Error cargando padres", Toast.LENGTH_LONG).show()
+        );
+        queue.add(request);
+
+        // Si el usuario elige "Registrar nuevo padre"
+        spinnerPadres.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Padre seleccionado = (Padre) parent.getItemAtPosition(position);
+                if (seleccionado.getId() == -99) {
+                    mostrarDialogoAgregarPadre(listaPadres, adapterPadres, spinnerPadres); // Aún por implementar
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        builder.setPositiveButton("Guardar", null);
+        builder.setNegativeButton("Cancelar", null);
         AlertDialog dialog = builder.create();
 
         dialog.setOnShowListener(d -> {
             Button btnGuardar = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            btnGuardar.setOnClickListener(v12 -> {
-                // Validar campos obligatorios
+            btnGuardar.setOnClickListener(v -> {
+                // Validación
                 String valNombre = nombre.getText().toString().trim();
                 String valApellido = apellido.getText().toString().trim();
                 String valFecha = fecha.getText().toString().trim();
                 String valGrado = grado.getText().toString().trim();
                 String valSeccion = seccion.getText().toString().trim();
-                String valPadreID = padreId.getText().toString().trim();
+                Padre padreSeleccionado = (Padre) spinnerPadres.getSelectedItem();
 
                 if (valNombre.isEmpty() || valApellido.isEmpty() || valFecha.isEmpty()
-                        || valGrado.isEmpty() || valSeccion.isEmpty() || valPadreID.isEmpty()) {
-                    Toast.makeText(GestionAlumnosActivity.this, "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
-                } else {
-                    registrarAlumnoEnServidor(
-                            valNombre,
-                            valApellido,
-                            valFecha,
-                            direccion.getText().toString().trim(),
-                            telefono.getText().toString().trim(),
-                            email.getText().toString().trim(),
-                            valGrado,
-                            valSeccion,
-                            valPadreID
-                    );
-                    dialog.dismiss(); // solo cerrar si fue exitoso
+                        || valGrado.isEmpty() || valSeccion.isEmpty() || padreSeleccionado == null || padreSeleccionado.getId() <= 0) {
+                    Toast.makeText(this, "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                registrarAlumnoEnServidor(
+                        valNombre,
+                        valApellido,
+                        valFecha,
+                        direccion.getText().toString().trim(),
+                        telefono.getText().toString().trim(),
+                        email.getText().toString().trim(),
+                        valGrado,
+                        valSeccion,
+                        String.valueOf(padreSeleccionado.getId())
+                );
+                dialog.dismiss();
             });
         });
-        builder.setNegativeButton("Cancelar", null);
-        dialog.show(); // este debe ir después de todo
+
+        dialog.show();
     }
+
+    private void mostrarDialogoAgregarPadre(List<Padre> listaPadres, ArrayAdapter<Padre> adapterPadres, Spinner spinnerPadres) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Registrar Nuevo Padre");
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_agregar_padre, null);
+        builder.setView(view);
+
+        EditText nombre = view.findViewById(R.id.edtNuevoNombre);
+        EditText apellido = view.findViewById(R.id.edtNuevoApellido);
+        EditText email = view.findViewById(R.id.edtNuevoEmail);
+        EditText telefono = view.findViewById(R.id.edtNuevoTelefono);
+        EditText dpi = view.findViewById(R.id.edtNuevoDPI);
+        EditText password = view.findViewById(R.id.edtNuevoPassword);
+
+        builder.setPositiveButton("Registrar", null);
+        builder.setNegativeButton("Cancelar", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(d1 -> {
+            Button btnRegistrar = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            btnRegistrar.setOnClickListener(v -> {
+                String valNombre = nombre.getText().toString().trim();
+                String valApellido = apellido.getText().toString().trim();
+                String valEmail = email.getText().toString().trim();
+                String valTelefono = telefono.getText().toString().trim();
+                String valDpi = dpi.getText().toString().trim();
+                String valPassword = password.getText().toString().trim();
+
+                if (valNombre.isEmpty() || valEmail.isEmpty() || valPassword.isEmpty()) {
+                    Toast.makeText(this, "Nombre, correo y contraseña son obligatorios", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                registrarPadreEnServidor(valNombre, valApellido, valEmail, valTelefono, valDpi, valPassword,
+                        listaPadres, adapterPadres, spinnerPadres);
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
+    }
+
+    private void registrarPadreEnServidor(String nombre, String apellido, String email, String telefono, String dpi, String password,
+                                          List<Padre> listaPadres, ArrayAdapter<Padre> adapterPadres, Spinner spinnerPadres) {
+        String url = "http://34.71.103.241/agregar_padre.php";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        if (obj.getBoolean("success")) {
+                            int nuevoId = obj.getInt("id");
+                            String nombreCompleto = obj.getString("nombre") + " " + obj.getString("apellido");
+
+                            Padre nuevoPadre = new Padre(nuevoId, nombreCompleto);
+                            // Insertar antes de la opción "➕ Registrar nuevo padre"
+                            listaPadres.add(listaPadres.size() - 1, nuevoPadre);
+                            adapterPadres.notifyDataSetChanged();
+                            spinnerPadres.setSelection(listaPadres.indexOf(nuevoPadre));
+
+                            Toast.makeText(this, "✅ Padre registrado correctamente", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "❌ Error: " + obj.getString("error"), Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        Toast.makeText(this, "Error al procesar respuesta del servidor", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> {
+                    Toast.makeText(this, "Error de red al registrar padre: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("nombre", nombre);
+                params.put("apellido", apellido);
+                params.put("email", email);
+                params.put("telefono", telefono);
+                params.put("dpi", dpi);
+                params.put("password", password);
+                return params;
+            }
+        };
+
+        queue.add(request);
+    }
+
 
     private void registrarAlumnoEnServidor(String nombre, String apellido, String fecha, String direccion,
                                            String telefono, String email, String grado, String seccion, String idPadre) {
