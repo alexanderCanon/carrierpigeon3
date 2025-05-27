@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -34,6 +35,18 @@ public class AlumnosPorMateriaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alumnos_por_materia);
         grado = getIntent().getStringExtra("grado");
         seccion = getIntent().getStringExtra("seccion");
+
+//        btnAviso.setOnClickListener(v -> {
+//            String grado = getIntent().getStringExtra("grado");
+//            String seccion = getIntent().getStringExtra("seccion");
+//
+//            Intent intent = new Intent(this, EnviarAvisoAlumnosActivity.class);
+//            intent.putExtra("grado", grado);
+//            intent.putExtra("seccion", seccion);
+//            startActivity(intent);
+//        });
+        //ESE BLOQUE VA A SER PARA ABRIR EL ACTIVITY DE ENVIAR AVISO ALUMNOS
+
 
         recyclerView = findViewById(R.id.recyclerAlumnos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
