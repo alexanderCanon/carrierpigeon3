@@ -1,6 +1,7 @@
 package director;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -142,10 +143,15 @@ public class EnviarAvisoActivity extends AppCompatActivity {
 
     private void enviarAvisoDirector(List<Integer> idsSeleccionados, String asunto, String mensaje) {
         String url = "http://34.71.103.241/enviar_avisos_director.php";
-
+        // Convertir la lista de IDs a JSON
+        JSONArray jsonArrayIds = new JSONArray();
+        for (int id : idsSeleccionados) {
+            jsonArrayIds.put(id);
+        }
         StringRequest request = new StringRequest(Request.Method.POST, url,
                 response -> {
-                    Toast.makeText(this, "✅ Aviso enviado correctamente", Toast.LENGTH_SHORT).show();
+                    Log.d("Aviso", "Respuesta: " + response);
+                    Toast.makeText(this, "📣 Aviso enviado", Toast.LENGTH_SHORT).show();
                 },
                 error -> {
                     error.printStackTrace();
@@ -155,9 +161,10 @@ public class EnviarAvisoActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
+                params.put("ids", jsonArrayIds.toString());
                 params.put("asunto", asunto);
                 params.put("mensaje", mensaje);
-                params.put("ids", new com.google.gson.Gson().toJson(idsSeleccionados)); // Enviamos array como JSON string
+                //params.put("ids", new com.google.gson.Gson().toJson(idsSeleccionados)); // Enviamos array como JSON string
                 return params;
             }
         };
