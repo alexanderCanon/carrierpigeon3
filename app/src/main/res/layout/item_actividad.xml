@@ -38,5 +38,17 @@
             android:text="Fecha de entrega"
             android:textColor="#7A9CA5"
             android:layout_marginTop="2dp" />
+
+        <ImageView
+            android:id="@+id/menuOpciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_more_vert"
+            android:contentDescription="Opciones"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

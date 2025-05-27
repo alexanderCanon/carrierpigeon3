@@ -1,5 +1,7 @@
 package com.principal.cp.maestros;
 
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -69,6 +71,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
         spinnerMateria = findViewById(R.id.spinnerMateria);
         cargarMaterias();
 
+        edtActividadID = findViewById(R.id.edtActividadID);
         edtTitulo = findViewById(R.id.edtTitulo);
         edtDescripcion = findViewById(R.id.edtDescripcion);
         spinnerTipo = findViewById(R.id.spinnerTipo);
@@ -86,16 +89,48 @@ public class GestionActividadesActivity extends AppCompatActivity {
         actividadAdapter = new ActividadAdapter(listaActividades);
         recyclerActividades.setAdapter(actividadAdapter);
 
-        fabAgregarActividad.setOnClickListener(v -> {
-            if (formularioScroll.getVisibility() == View.GONE) {
-                formularioScroll.setVisibility(View.VISIBLE);
-                mostrarFormularioAgregar(); // Limpia los campos
-            } else {
-                formularioScroll.setVisibility(View.GONE);
+        actividadAdapter.setOnActividadClickListener(new ActividadAdapter.OnActividadClickListener() {
+
+            @Override
+            public void onEditarClick(Actividad actividad) {
+                mostrarFormularioEditar(actividad);
             }
+
+
+
+            @Override
+            public void onEliminarClick(Actividad actividad) {
+                new MaterialAlertDialogBuilder(GestionActividadesActivity.this, R.style.CustomAlertDialog)
+                        .setTitle("¿Eliminar actividad?")
+                        .setMessage("¿Deseas eliminar la actividad \"" + actividad.titulo + "\"?")
+                        .setPositiveButton("Eliminar", (dialog, which) -> {
+                            String data = "id_actividad=" + actividad.id_actividad;
+                            new ActividadTask("http://34.71.103.241/eliminar_actividad.php") {
+                                @Override
+                                protected void onPostExecute(String resultado) {
+                                    super.onPostExecute(resultado);
+                                    cargarActividadesEnCurso(); // recargar la lista
+                                }
+                            }.execute(data);
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .show();
+            }
+
         });
 
 
+        fabAgregarActividad.setOnClickListener(v -> {
+            if (formularioScroll.getVisibility() == View.GONE) {
+                formularioScroll.setVisibility(View.VISIBLE);
+                recyclerActividades.setVisibility(View.GONE);
+                mostrarFormularioAgregar();
+            } else {
+                formularioScroll.setVisibility(View.GONE);
+                recyclerActividades.setVisibility(View.VISIBLE);
+                cargarActividadesEnCurso();
+            }
+        });
 
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
@@ -123,7 +158,6 @@ public class GestionActividadesActivity extends AppCompatActivity {
         btnRegistrarActividad.setOnClickListener(v -> {
             String data = getActividadData(false);
             new ActividadTask("http://34.71.103.241/registrar_actividad.php").execute(data);
-            formularioScroll.setVisibility(View.GONE);
         });
 
         btnEditarActividad.setOnClickListener(v -> {
@@ -161,6 +195,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
         cargarActividadesEnCurso();
     }
     private void mostrarFormularioAgregar() {
+        edtActividadID.setText("");
         edtTitulo.setText("");
         edtDescripcion.setText("");
         edtFechaEntrega.setText("");
@@ -173,8 +208,39 @@ public class GestionActividadesActivity extends AppCompatActivity {
         spinnerTipo.setEnabled(true);
         spinnerMateria.setEnabled(true);
 
+        btnRegistrarActividad.setVisibility(View.VISIBLE);
+        btnEditarActividad.setVisibility(View.GONE);
+        btnEliminarActividad.setVisibility(View.GONE);
+
         edtTitulo.requestFocus();
     }
+
+    private void mostrarFormularioEditar(Actividad actividad) {
+        formularioScroll.setVisibility(View.VISIBLE);
+        recyclerActividades.setVisibility(View.GONE);
+
+        edtActividadID.setText(String.valueOf(actividad.id_actividad));
+        edtTitulo.setText(actividad.titulo);
+        edtDescripcion.setText(actividad.descripcion);
+        edtFechaEntrega.setText(actividad.fecha_entrega);
+        edtValorTotal.setText("");
+
+        // Spinner tipo
+        for (int i = 0; i < spinnerTipo.getCount(); i++) {
+            if (spinnerTipo.getItemAtPosition(i).toString().equalsIgnoreCase(actividad.tipo)) {
+                spinnerTipo.setSelection(i);
+                break;
+            }
+        }
+
+        // Activar/desactivar botones
+        btnRegistrarActividad.setVisibility(View.GONE);
+        btnEditarActividad.setVisibility(View.VISIBLE);
+        btnEliminarActividad.setVisibility(View.GONE);
+
+        spinnerMateria.setEnabled(false);
+    }
+
 
 
     private String getActividadData(boolean incluirID) {
@@ -205,6 +271,8 @@ public class GestionActividadesActivity extends AppCompatActivity {
         }
     }
     private void cargarActividadesEnCurso() {
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        idUsuario = prefs.getInt("id_usuario", -1);
         new Thread(() -> {
             try {
                 URL url = new URL("http://34.71.103.241/listar_actividades_en_progreso.php?id_usuario=" + idUsuario);
@@ -225,8 +293,8 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 for (int i = 0; i < actividadesJSON.length(); i++) {
                     JSONObject obj = actividadesJSON.getJSONObject(i);
                     Actividad actividad = new Actividad(
-                            obj.getInt("id"),
-                            obj.getInt("id_materia"),
+                            obj.getInt("id_actividad"),
+                            obj.getInt("id_asignacion"),
                             obj.getString("titulo"),
                             obj.getString("descripcion"),
                             obj.getString("tipo"),
@@ -239,6 +307,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.e("ACTIVIDAD_ERROR", "Error cargando actividades", e);
                 runOnUiThread(() -> Toast.makeText(this, "Error al cargar actividades", Toast.LENGTH_SHORT).show());
             }
         }).start();
@@ -359,7 +428,14 @@ public class GestionActividadesActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String resultado) {
             Toast.makeText(GestionActividadesActivity.this, resultado, Toast.LENGTH_LONG).show();
+
+            if (resultado.contains("Actividad registrada")) {
+                formularioScroll.setVisibility(View.GONE);
+                recyclerActividades.setVisibility(View.VISIBLE);
+                cargarActividadesEnCurso(); // ✅ ahora sí, después del éxito
+            }
         }
+
     }
 
 }

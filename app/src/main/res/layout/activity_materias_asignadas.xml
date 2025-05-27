@@ -24,16 +24,15 @@
 
     <!-- Lista de materias -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerActividades"
+        android:id="@+id/recyclerMaterias"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloMaterias"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="visible"/>
+        android:layout_marginTop="12dp"/>
+
 
 
     <!-- Hotbar inferior -->

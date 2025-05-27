@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Spinner
+        android:id="@+id/spinnerActividad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:spinnerMode="dropdown"/>
+
+
     <EditText
         android:id="@+id/edtAlumnoID"
         android:layout_width="match_parent"

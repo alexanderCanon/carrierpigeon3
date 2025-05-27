@@ -15,11 +15,20 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/edtActividadID"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
         <Spinner
             android:id="@+id/spinnerMateria"
