@@ -4,17 +4,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.principal.cp.R;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,84 +31,71 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 
 public class GestionActividadesActivity extends AppCompatActivity {
 
-    private EditText edtActividadID, edtIdMateria, edtTitulo, edtDescripcion,
-            edtFechaEntrega, edtValorTotal, edtGrado, edtSeccion, edtIdMaestro;
+    private EditText edtActividadID, edtTitulo, edtDescripcion, edtFechaEntrega, edtValorTotal;
     private Button btnRegistrarActividad, btnEditarActividad, btnEliminarActividad;
     private Spinner spinnerTipo, spinnerMateria;
     private List<Materia> listaMaterias = new ArrayList<>();
 
     private int idUsuario;
+    private int idAsignacionSeleccionada = -1;
+    private String gradoSeleccionado = "", seccionSeleccionada = "";
+    private ScrollView formularioScroll;
+    private FloatingActionButton fabAgregarActividad;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gestion_actividades); // ✅ PRIMERO
+        setContentView(R.layout.activity_gestion_actividades);
 
-
-        // ✅ Luego inicializas todo
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         idUsuario = prefs.getInt("id_usuario", -1);
 
 
-        edtActividadID = findViewById(R.id.edtActividadID);
         spinnerMateria = findViewById(R.id.spinnerMateria);
         cargarMaterias();
+
         edtTitulo = findViewById(R.id.edtTitulo);
         edtDescripcion = findViewById(R.id.edtDescripcion);
         spinnerTipo = findViewById(R.id.spinnerTipo);
         edtFechaEntrega = findViewById(R.id.edtFechaEntrega);
+        edtValorTotal = findViewById(R.id.edtValorTotal);
+
         edtFechaEntrega.setFocusable(false);
         edtFechaEntrega.setOnClickListener(v -> mostrarDateTimePicker());
-        edtValorTotal = findViewById(R.id.edtValorTotal);
-        edtGrado = findViewById(R.id.edtGrado);
-        edtSeccion = findViewById(R.id.edtSeccion);
-        edtIdMaestro = findViewById(R.id.edtIdMaestro);
+        FloatingActionButton fab = findViewById(R.id.fabAgregarActividad);
+        fab.setOnClickListener(v -> {
+            mostrarFormularioAgregar();
+        });
 
-        Spinner spinnerTipo = findViewById(R.id.spinnerTipo);
+
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
-                new String[]{"tarea", "examen", "proyecto", "otro"});
+                new String[]{"Tarea", "Examen", "Proyecto", "Otro"});
         adapterTipo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTipo.setAdapter(adapterTipo);
 
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_actividades);
-
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_materias) {
-                Intent intent = new Intent(GestionActividadesActivity.this, MateriasAsignadasActivity.class);
-                intent.putExtra("id_usuario", idUsuario); // 👈 muy importante
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.nav_actividades) {
-                return true;
-            } else if (id == R.id.nav_notas) {
-                startActivity(new Intent(GestionActividadesActivity.this, GestionNotasActivity.class));
-                return true;
-            } else if (id == R.id.nav_asistencia) {
-                startActivity(new Intent(GestionActividadesActivity.this, GestionAsistenciaActivity.class));
-                return true;
+        spinnerMateria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Materia materiaSeleccionada = (Materia) parent.getItemAtPosition(position);
+                idAsignacionSeleccionada = materiaSeleccionada.id_asignacion;
+                gradoSeleccionado = materiaSeleccionada.getGrado();
+                seccionSeleccionada = materiaSeleccionada.getSeccion();
             }
-            return false;
-        });
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         btnRegistrarActividad = findViewById(R.id.btnRegistrarActividad);
         btnEditarActividad = findViewById(R.id.btnEditarActividad);
@@ -109,7 +103,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
         btnRegistrarActividad.setOnClickListener(v -> {
             String data = getActividadData(false);
-            new ActividadTask("http://34.122.138.135/registrar_actividad.php").execute(data);
+            new ActividadTask("http://34.71.103.241/registrar_actividad.php").execute(data);
         });
 
         btnEditarActividad.setOnClickListener(v -> {
@@ -123,18 +117,56 @@ public class GestionActividadesActivity extends AppCompatActivity {
             new ActividadTask("http://34.122.138.135/eliminar_actividad.php").execute(data);
         });
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_actividades);
 
-
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_materias) {
+                Intent intent = new Intent(GestionActividadesActivity.this, MateriasAsignadasActivity.class);
+                intent.putExtra("id_usuario", idUsuario);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_actividades) {
+                return true;
+            } else if (id == R.id.nav_notas) {
+                startActivity(new Intent(GestionActividadesActivity.this, GestionNotasActivity.class));
+                return true;
+            } else if (id == R.id.nav_asistencia) {
+                startActivity(new Intent(GestionActividadesActivity.this, GestionAsistenciaActivity.class));
+                return true;
+            }
+            return false;
+        });
     }
+    private void mostrarFormularioAgregar() {
+        // Limpiar los campos del formulario
+        edtActividadID.setText(""); // solo si quieres reutilizar el mismo campo
+        edtTitulo.setText("");
+        edtDescripcion.setText("");
+        edtFechaEntrega.setText("");
+        edtValorTotal.setText("");
+
+        // Habilitar los campos por si estaban desactivados
+        edtTitulo.setEnabled(true);
+        edtDescripcion.setEnabled(true);
+        edtFechaEntrega.setEnabled(true);
+        edtValorTotal.setEnabled(true);
+        spinnerTipo.setEnabled(true);
+        spinnerMateria.setEnabled(true);
+
+        // Puedes poner el foco si deseas
+        edtTitulo.requestFocus();
+
+        // Notificación opcional
+        Toast.makeText(this, "Formulario listo para nueva actividad", Toast.LENGTH_SHORT).show();
+    }
+
 
     private String getActividadData(boolean incluirID) {
         try {
-            // Obtener tipo desde Spinner
             String tipo = spinnerTipo.getSelectedItem().toString();
-
-            // Obtener materia seleccionada desde Spinner
-            Materia materiaSeleccionada = (Materia) spinnerMateria.getSelectedItem();
-            int idAsignacion = materiaSeleccionada.id_asignacion;
+            Log.d("FECHA_DEBUG", "Fecha: " + edtFechaEntrega.getText().toString());
 
             StringBuilder data = new StringBuilder();
 
@@ -142,15 +174,15 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 data.append("id_actividad=").append(URLEncoder.encode(edtActividadID.getText().toString(), "UTF-8")).append("&");
             }
 
-            data.append("id_asignacion=").append(URLEncoder.encode(String.valueOf(idAsignacion), "UTF-8")).append("&");
+            data.append("id_asignacion=").append(idAsignacionSeleccionada).append("&");
             data.append("titulo=").append(URLEncoder.encode(edtTitulo.getText().toString(), "UTF-8")).append("&");
             data.append("descripcion=").append(URLEncoder.encode(edtDescripcion.getText().toString(), "UTF-8")).append("&");
             data.append("tipo=").append(URLEncoder.encode(tipo, "UTF-8")).append("&");
             data.append("fecha_entrega=").append(URLEncoder.encode(edtFechaEntrega.getText().toString(), "UTF-8")).append("&");
             data.append("valor_total=").append(URLEncoder.encode(edtValorTotal.getText().toString(), "UTF-8")).append("&");
-            data.append("grado=").append(URLEncoder.encode(edtGrado.getText().toString(), "UTF-8")).append("&");
-            data.append("seccion=").append(URLEncoder.encode(edtSeccion.getText().toString(), "UTF-8")).append("&");
-            data.append("id_usuario_maestro=").append(URLEncoder.encode(edtIdMaestro.getText().toString(), "UTF-8"));
+            data.append("grado=").append(URLEncoder.encode(gradoSeleccionado, "UTF-8")).append("&");
+            data.append("seccion=").append(URLEncoder.encode(seccionSeleccionada, "UTF-8")).append("&");
+            data.append("id_usuario_maestro=").append(idUsuario);
 
             return data.toString();
         } catch (Exception e) {
@@ -159,7 +191,43 @@ public class GestionActividadesActivity extends AppCompatActivity {
         }
     }
 
+    private void cargarMaterias() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.71.103.241/maestros/api_materias/materias_asignadas_html.php?id_usuario=" + idUsuario);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
 
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JSONArray arr = new JSONArray(result.toString());
+                listaMaterias.clear();
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject item = arr.getJSONObject(i);
+                    int id_asignacion = item.getInt("id_asignacion");
+                    String nombre = item.getString("nombre");
+                    String grado = item.getString("grado");
+                    String seccion = item.getString("seccion");
+                    listaMaterias.add(new Materia(id_asignacion, nombre, grado, seccion));
+                }
+
+                runOnUiThread(() -> {
+                    ArrayAdapter<Materia> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaMaterias);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerMateria.setAdapter(adapter);
+                });
+
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, "Error al cargar materias", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
 
     private void mostrarDateTimePicker() {
         final Calendar calendar = Calendar.getInstance();
@@ -167,18 +235,23 @@ public class GestionActividadesActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 (view, year, monthOfYear, dayOfMonth) -> {
                     int finalYear = year;
-                    int finalMonth = monthOfYear + 1; // Calendar is zero-based
+                    int finalMonth = monthOfYear + 1;
                     int finalDay = dayOfMonth;
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(GestionActividadesActivity.this,
                             (view1, hourOfDay, minute) -> {
-                                String fechaSeleccionada = String.format("%04d-%02d-%02d %02d:%02d:00",
+                                String fechaHora = String.format("%04d-%02d-%02d %02d:%02d:00",
                                         finalYear, finalMonth, finalDay, hourOfDay, minute);
-                                edtFechaEntrega.setText(fechaSeleccionada);
-                            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                                edtFechaEntrega.setText(fechaHora);
+                            },
+                            calendar.get(Calendar.HOUR_OF_DAY),
+                            calendar.get(Calendar.MINUTE),
+                            true);
                     timePickerDialog.show();
-
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
 
@@ -197,6 +270,9 @@ public class GestionActividadesActivity extends AppCompatActivity {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+                Log.d("DATA_ENVIADA", params[0]); // Ver qué se está mandando
 
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -230,48 +306,5 @@ public class GestionActividadesActivity extends AppCompatActivity {
             Toast.makeText(GestionActividadesActivity.this, resultado, Toast.LENGTH_LONG).show();
         }
     }
-    private void cargarMaterias() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://34.71.103.241/maestros/api_materias/materias_asignadas_html.php?id_usuario=" + idUsuario);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder result = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
-                }
-
-                JSONArray jsonArray = new JSONArray(result.toString());
-                listaMaterias.clear();
-
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject obj = jsonArray.getJSONObject(i);
-                    listaMaterias.add(new Materia(
-                            obj.getInt("id_asignacion"),  // ✅ CORRECTO
-                            obj.getString("nombre"),
-                            obj.getString("grado"),
-                            obj.getString("seccion")
-                    ));
-
-                }
-
-                runOnUiThread(() -> {
-                    ArrayAdapter<Materia> adapter = new ArrayAdapter<>(GestionActividadesActivity.this,
-                            android.R.layout.simple_spinner_item, listaMaterias);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerMateria.setAdapter(adapter);
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error al cargar materias", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
-    }
 
 }
-

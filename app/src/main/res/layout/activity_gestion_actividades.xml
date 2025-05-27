@@ -8,6 +8,7 @@
 
     <ScrollView
         android:id="@+id/formularioScroll"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,18 +20,6 @@
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <!-- ID Actividad (para editar/eliminar) -->
-        <EditText
-            android:id="@+id/edtActividadID"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="ID Actividad"
-            android:inputType="number"
-            android:padding="12dp"
-            android:textColor="#2C5C60"
-            android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
 
         <Spinner
             android:id="@+id/spinnerMateria"
@@ -94,38 +83,7 @@
             android:textColorHint="#7A9CA5"
             android:background="@drawable/edittext_background"/>
 
-        <EditText
-            android:id="@+id/edtGrado"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Grado"
-            android:inputType="text"
-            android:padding="12dp"
-            android:textColor="#2C5C60"
-            android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
 
-        <EditText
-            android:id="@+id/edtSeccion"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Sección"
-            android:inputType="text"
-            android:padding="12dp"
-            android:textColor="#2C5C60"
-            android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
-
-        <EditText
-            android:id="@+id/edtIdMaestro"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="ID Maestro"
-            android:inputType="number"
-            android:padding="12dp"
-            android:textColor="#2C5C60"
-            android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
 
         <!-- Botones -->
         <Button
@@ -153,10 +111,20 @@
             android:background="@drawable/button_background"
             android:padding="12dp"
             android:layout_marginTop="12dp"/>
-        />
 
     </LinearLayout>
     </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarActividad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Agregar actividad"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/bottom_nav_icon_color"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
