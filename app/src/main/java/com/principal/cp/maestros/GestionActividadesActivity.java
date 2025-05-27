@@ -15,6 +15,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -50,6 +52,9 @@ public class GestionActividadesActivity extends AppCompatActivity {
     private String gradoSeleccionado = "", seccionSeleccionada = "";
     private ScrollView formularioScroll;
     private FloatingActionButton fabAgregarActividad;
+    private RecyclerView recyclerActividades;
+    private ActividadAdapter actividadAdapter;
+    private List<Actividad> listaActividades = new ArrayList<>();
 
 
     @Override
@@ -72,10 +77,24 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
         edtFechaEntrega.setFocusable(false);
         edtFechaEntrega.setOnClickListener(v -> mostrarDateTimePicker());
-        FloatingActionButton fab = findViewById(R.id.fabAgregarActividad);
-        fab.setOnClickListener(v -> {
-            mostrarFormularioAgregar();
+
+        formularioScroll = findViewById(R.id.formularioScroll);
+        fabAgregarActividad = findViewById(R.id.fabAgregarActividad);
+
+        recyclerActividades = findViewById(R.id.recyclerActividades);
+        recyclerActividades.setLayoutManager(new LinearLayoutManager(this));
+        actividadAdapter = new ActividadAdapter(listaActividades);
+        recyclerActividades.setAdapter(actividadAdapter);
+
+        fabAgregarActividad.setOnClickListener(v -> {
+            if (formularioScroll.getVisibility() == View.GONE) {
+                formularioScroll.setVisibility(View.VISIBLE);
+                mostrarFormularioAgregar(); // Limpia los campos
+            } else {
+                formularioScroll.setVisibility(View.GONE);
+            }
         });
+
 
 
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(this,
@@ -104,6 +123,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
         btnRegistrarActividad.setOnClickListener(v -> {
             String data = getActividadData(false);
             new ActividadTask("http://34.71.103.241/registrar_actividad.php").execute(data);
+            formularioScroll.setVisibility(View.GONE);
         });
 
         btnEditarActividad.setOnClickListener(v -> {
@@ -138,16 +158,14 @@ public class GestionActividadesActivity extends AppCompatActivity {
             }
             return false;
         });
+        cargarActividadesEnCurso();
     }
     private void mostrarFormularioAgregar() {
-        // Limpiar los campos del formulario
-        edtActividadID.setText(""); // solo si quieres reutilizar el mismo campo
         edtTitulo.setText("");
         edtDescripcion.setText("");
         edtFechaEntrega.setText("");
         edtValorTotal.setText("");
 
-        // Habilitar los campos por si estaban desactivados
         edtTitulo.setEnabled(true);
         edtDescripcion.setEnabled(true);
         edtFechaEntrega.setEnabled(true);
@@ -155,11 +173,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
         spinnerTipo.setEnabled(true);
         spinnerMateria.setEnabled(true);
 
-        // Puedes poner el foco si deseas
         edtTitulo.requestFocus();
-
-        // Notificación opcional
-        Toast.makeText(this, "Formulario listo para nueva actividad", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -190,6 +204,47 @@ public class GestionActividadesActivity extends AppCompatActivity {
             return "";
         }
     }
+    private void cargarActividadesEnCurso() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.71.103.241/listar_actividades_en_progreso.php?id_usuario=" + idUsuario);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JSONArray actividadesJSON = new JSONArray(result.toString());
+                listaActividades.clear();
+
+                for (int i = 0; i < actividadesJSON.length(); i++) {
+                    JSONObject obj = actividadesJSON.getJSONObject(i);
+                    Actividad actividad = new Actividad(
+                            obj.getInt("id"),
+                            obj.getInt("id_materia"),
+                            obj.getString("titulo"),
+                            obj.getString("descripcion"),
+                            obj.getString("tipo"),
+                            obj.getString("fecha_entrega")
+                    );
+                    listaActividades.add(actividad);
+                }
+
+                runOnUiThread(() -> actividadAdapter.notifyDataSetChanged());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error al cargar actividades", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+
 
     private void cargarMaterias() {
         new Thread(() -> {
