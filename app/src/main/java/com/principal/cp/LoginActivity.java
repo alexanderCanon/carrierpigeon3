@@ -61,6 +61,27 @@ public class LoginActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM_TOKEN", "No se pudo obtener el token", task.getException());
+                        return;
+                    }
+
+                    String token = task.getResult();
+                    Log.d("FCM_TOKEN", "Token obtenido: " + token);
+
+                    // Aquí envías el token al backend
+                    SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+                    int idUsuario = prefs.getInt("id_usuario", -1); // -1 como valor por defecto
+
+                    if (idUsuario != -1) {
+                        enviarTokenAlServidor(idUsuario, token);
+                    }else{
+                        Log.e("FCM_TOKEN", "ID de usuario no encontrado en sesión");
+                    }
+                });
+
         // Verificar si ya hay una sesión activa
         if (sharedPreferences.getBoolean("isLoggedIn", false)) {
             redirectToMainActivity();
@@ -90,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //FIREBASEMESSAGING PART
+        /*
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
@@ -122,7 +143,26 @@ public class LoginActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }).start();
-                });
+                }); */
+    } //FIN ONCREATE
+
+    private void enviarTokenAlServidor(int idUsuario, String token) {
+        String url = "http://34.71.103.241/actualizar_token.php";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                response -> Log.d("FCM_TOKEN", "Token enviado correctamente"),
+                error -> Log.e("FCM_TOKEN", "Error al enviar token", error)
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_usuario", String.valueOf(idUsuario));
+                params.put("token", token);
+                return params;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(request);
     }
 
     private void loginUser(final String email, final String password) {
@@ -139,6 +179,7 @@ public class LoginActivity extends AppCompatActivity {
                                 int idUsuario = jsonObject.getInt("id_usuario");
                                 SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = prefs.edit();
+                                editor.putInt("id_usuario", idUsuario);
                                 editor.putString("id_usuario", String.valueOf(idUsuario)); // guardamos como string por compatibilidad
                                 editor.apply();
 
@@ -146,7 +187,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 // Guardar información del usuario en SharedPreferences
                                 editor.putBoolean("isLoggedIn", true); //para definir que ya hay una sesion activa
-                                editor.putInt("user_id", jsonObject.getInt("id_usuario"));
+                                //editor.putInt("user_id", jsonObject.getInt("id_usuario"));
                                 String tipoUsuario = jsonObject.getString("tipo_usuario");
                                 editor.putString("tipo_usuario", jsonObject.getString("tipo_usuario"));
                                 editor.putString("nombre", jsonObject.getString("nombre"));

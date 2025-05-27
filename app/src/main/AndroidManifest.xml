@@ -20,13 +20,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CarrierPigeon3"
         tools:targetApi="31">
-        <activity android:name="com.principal.cp.maestros.GestionActividadesActivity" android:exported="false" />
-
-        <activity android:name="com.principal.cp.maestros.GestionAsistenciaActivity" android:exported="false" />
-        <activity android:name="com.principal.cp.maestros.GestionMaestrosActivity" android:exported="false" />
-        <activity android:name="com.principal.cp.maestros.GestionNotasActivity" android:exported="false" />
-
-
+        <activity
+            android:name="director.EnviarAvisoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".maestros.GestionActividadesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".maestros.GestionAsistenciaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".maestros.GestionNotasActivity"
+            android:exported="false" />
         <activity
             android:name="director.AsignarMateriaWebActivity"
             android:exported="false" />

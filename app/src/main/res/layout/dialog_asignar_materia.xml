@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:id="@+id/spinnerMaestro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
+
+
+        <Spinner
+            android:id="@+id/spinnerMateria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
+
+
+        <EditText
+            android:id="@+id/edtGrado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Grado (Ej: Primero Básico)"/>
+
+        <EditText
+            android:id="@+id/edtSeccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Sección (Ej: A)"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</ScrollView>

@@ -14,27 +14,27 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 public class MyFireBaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
-        Log.d(TAG, "Notificación recibida: " + remoteMessage.getNotification().getBody());
-
-        // Aquí podrías mostrar la notificación manualmente si deseas algo personalizado
-
-    }
-
-    // ✅ Se llama automáticamente si el token cambia
-    @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
-        Log.d(TAG, "Nuevo token generado: " + token);
-        sendTokenToServer(token);
+        Log.d("FCM_TOKEN", "Nuevo token generado: " + token);
+
+        // Aquí puedes guardar el token localmente si quieres
+        // O enviarlo directamente al backend si el usuario está logueado
     }
 
-    // ✅ Enviar el nuevo token al servidor PHP
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+
+        // Aquí puedes personalizar qué hacer si la app está en primer plano
+        Log.d("FCM_MSG", "Mensaje recibido: " + remoteMessage.getNotification().getBody());
+    }
+
     private void sendTokenToServer(String token) {
         new Thread(() -> {
             try {
