@@ -1,5 +1,6 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.principal.cp.R;
 
@@ -51,6 +54,36 @@ public class RegistrarAsistenciaActivity extends AppCompatActivity {
         seccion = getIntent().getStringExtra("seccion");
 
         cargarAlumnos();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_notas);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_materias) {
+                startActivity(new Intent(this, MateriasAsignadasActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+
+            if (itemId == R.id.nav_actividades) {
+                startActivity(new Intent(this, GestionActividadesActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+
+            if (itemId == R.id.nav_notas) {
+                return true; // ya estás aquí
+            }
+
+            if (itemId == R.id.nav_asistencia) {
+                startActivity(new Intent(this, GestionAsistenciaActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+
+            return false;
+        });
 
         fabGuardar.setOnClickListener(v -> guardarAsistencias());
     }

@@ -90,7 +90,7 @@ public class GestionNotasActivity extends AppCompatActivity {
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_notas); // marcar como activo
+        bottomNavigationView.setSelectedItemId(R.id.nav_notas);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();

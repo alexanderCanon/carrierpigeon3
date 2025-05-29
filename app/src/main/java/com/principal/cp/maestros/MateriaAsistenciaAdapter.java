@@ -60,20 +60,29 @@ public class MateriaAsistenciaAdapter extends RecyclerView.Adapter<MateriaAsiste
             inflater.inflate(R.menu.menu_asistencia_curso, popup.getMenu());
 
             popup.setOnMenuItemClickListener(item -> {
-                Intent intent = new Intent(context, RegistrarAsistenciaActivity.class);
-                intent.putExtra("id_asignacion", materia.getId_asignacion());
-                intent.putExtra("grado", materia.getGrado());
-                intent.putExtra("seccion", materia.getSeccion());
+                int itemId = item.getItemId();
 
-                if (item.getItemId() == R.id.registrar_asistencia) {
-                    intent.putExtra("modo", "registrar");
-                } else if (item.getItemId() == R.id.editar_asistencia) {
-                    intent.putExtra("modo", "editar");
+                if (itemId == R.id.registrar_asistencia) {
+                    Intent intentRegistrar = new Intent(context, RegistrarAsistenciaActivity.class);
+                    intentRegistrar.putExtra("id_asignacion", materia.getId_asignacion());
+                    intentRegistrar.putExtra("grado", materia.getGrado());
+                    intentRegistrar.putExtra("seccion", materia.getSeccion());
+                    context.startActivity(intentRegistrar);
+                    return true;
+
+                } else if (itemId == R.id.editar_asistencia) {
+                    Intent intentEditar = new Intent(context, EditarAsistenciaActivity.class);
+                    intentEditar.putExtra("id_asignacion", materia.getId_asignacion());
+                    intentEditar.putExtra("grado", materia.getGrado());
+                    intentEditar.putExtra("seccion", materia.getSeccion());
+                    context.startActivity(intentEditar);
+                    return true;
                 }
 
-                context.startActivity(intent);
-                return true;
+                return false;
             });
+
+
 
             popup.show();
         });

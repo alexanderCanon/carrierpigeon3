@@ -7,38 +7,68 @@
     android:background="#F2EFE5">
 
     <TextView
-        android:id="@+id/tvTituloAsistencia"
+        android:id="@+id/tvTituloEditar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📝 Registrar Asistencia"
+        android:text="✏️ Editar Asistencia"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#2C5C60"
-        android:layout_marginTop="28dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center" />
+        android:layout_marginTop="28dp"/>
+
+    <EditText
+        android:id="@+id/edtFechaSeleccionada"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Seleccione fecha"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
+        android:background="@drawable/edittext_background"
+        android:padding="10dp"
+        android:textColorHint="#7A9CA5"
+        android:textColor="#2C5C60"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloEditar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
+
+    <Button
+        android:id="@+id/btnCargarAsistencia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cargar Asistencia"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/edtFechaSeleccionada"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerAlumnosAsistencia"
+        android:id="@+id/recyclerEditarAsistencia"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloAsistencia"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintTop_toBottomOf="@id/btnCargarAsistencia"
+        app:layout_constraintBottom_toTopOf="@+id/fabGuardarCambios"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabGuardarAsistencia"
+        android:id="@+id/fabGuardarCambios"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:contentDescription="Guardar asistencia"
+        android:contentDescription="Guardar cambios"
         android:src="@drawable/ic_save"
         app:backgroundTint="@color/bottom_nav_icon_color"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -52,4 +82,5 @@
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_color"
         app:itemTextColor="@color/bottom_nav_icon_color" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
