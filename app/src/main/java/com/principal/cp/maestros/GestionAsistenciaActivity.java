@@ -1,126 +1,133 @@
 package com.principal.cp.maestros;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.principal.cp.R;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class GestionAsistenciaActivity extends AppCompatActivity {
 
-    private EditText edtAlumnoID, edtFecha, edtAsistencia, edtObservaciones;
-    private Button btnRegistrarAsistencia;
+    private RecyclerView recyclerView;
+    private ArrayList<Materia> listaMaterias;
+    private MateriaAsistenciaAdapter adapter;
+    private int idUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gestion_asistencia);
+        setContentView(R.layout.activity_asistencia_cursos);
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        idUsuario = prefs.getInt("id_usuario", -1);
 
-        edtAlumnoID = findViewById(R.id.edtAlumnoID);
-        edtFecha = findViewById(R.id.edtFecha);
-        edtAsistencia = findViewById(R.id.edtAsistencia);
-        edtObservaciones = findViewById(R.id.edtObservaciones);
-        btnRegistrarAsistencia = findViewById(R.id.btnRegistrarAsistencia);
+        recyclerView = findViewById(R.id.recyclerCursosAsistencia);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        btnRegistrarAsistencia.setOnClickListener(new View.OnClickListener() {
+        listaMaterias = new ArrayList<>();
+        adapter = new MateriaAsistenciaAdapter(listaMaterias, this);
+        recyclerView.setAdapter(adapter);
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_asistencia);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_materias) {
+                Intent intent = new Intent(this, MateriasAsignadasActivity.class);
+                intent.putExtra("id_usuario", idUsuario);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_actividades) {
+                startActivity(new Intent(this, GestionActividadesActivity.class));
+                return true;
+            } else if (id == R.id.nav_notas) {
+                startActivity(new Intent(this, GestionNotasActivity.class));
+                return true;
+            } else if (id == R.id.nav_asistencia) {
+                return true;
+            }
+            return false;
+        });
+
+
+        cargarMateriasAsignadas();
+    }
+
+    private void cargarMateriasAsignadas() {
+        SharedPreferences prefs = getSharedPreferences("session", Context.MODE_PRIVATE);
+        int idMaestro = prefs.getInt("id_usuario", -1);
+
+        if (idMaestro == -1) {
+            Toast.makeText(this, "ID de maestro no encontrado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String url = "http://34.71.103.241/maestros/api_materias/materias_asignadas_html.php?id_usuario=" + idMaestro;
+
+        new AsyncTask<Void, Void, JSONArray>() {
             @Override
-            public void onClick(View v) {
-                String alumnoID = edtAlumnoID.getText().toString();
-                String fecha = edtFecha.getText().toString();
-                String asistencia = edtAsistencia.getText().toString(); // "1" o "0"
-                String observaciones = edtObservaciones.getText().toString();
+            protected JSONArray doInBackground(Void... voids) {
+                try {
+                    URL endpoint = new URL(url);
+                    HttpURLConnection conn = (HttpURLConnection) endpoint.openConnection();
+                    conn.setRequestMethod("GET");
 
-                registrarAsistencia(alumnoID, fecha, asistencia, observaciones);
-            }
-        });
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    reader.close();
 
-        Button btnEditarAsistencia = findViewById(R.id.btnEditarAsistencia);
-        btnEditarAsistencia.setOnClickListener(v -> {
-            String alumnoID = edtAlumnoID.getText().toString();
-            String fecha = edtFecha.getText().toString();
-            String asistencia = edtAsistencia.getText().toString();
-            String observaciones = edtObservaciones.getText().toString();
-
-            editarAsistencia(alumnoID, fecha, asistencia, observaciones);
-        });
-
-        Button btnVolverMaestros = findViewById(R.id.btnVolverMaestros);
-        btnVolverMaestros.setOnClickListener(v -> {
-            Intent intent = new Intent(GestionAsistenciaActivity.this, MaestroMainActivity.class);
-            startActivity(intent);
-            finish(); // opcional, para cerrar la activity actual
-        });
-
-
-    }
-
-    private void registrarAsistencia(String alumnoID, String fecha, String asistencia, String observaciones) {
-        String data = "id_alumno=" + alumnoID +
-                "&fecha=" + fecha +
-                "&presente=" + asistencia +
-                "&observaciones=" + observaciones;
-        new EnviarAsistenciaTask("http://34.122.138.135/registrar_asistencia.php").execute(data);
-    }
-
-    private void editarAsistencia(String alumnoID, String fecha, String asistencia, String observaciones) {
-        String data = "id_alumno=" + alumnoID +
-                "&fecha=" + fecha +
-                "&presente=" + asistencia +
-                "&observaciones=" + observaciones;
-        new EnviarAsistenciaTask("http://34.122.138.135/editar_asistencia.php").execute(data);
-    }
-
-    private class EnviarAsistenciaTask extends AsyncTask<String, Void, String> {
-        private final String url;
-
-        public EnviarAsistenciaTask(String url) {
-            this.url = url;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL(this.url);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-
-                OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-                writer.write(params[0]);
-                writer.flush();
-                writer.close();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder result = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
+                    Log.d("RESPUESTA", result.toString());
+                    return new JSONArray(result.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
                 }
-
-                reader.close();
-                return result.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Error de conexión";
             }
-        }
 
-        @Override
-        protected void onPostExecute(String result) {
-            Toast.makeText(GestionAsistenciaActivity.this, result, Toast.LENGTH_LONG).show();
-        }
+            @Override
+            protected void onPostExecute(JSONArray response) {
+                if (response != null) {
+                    try {
+                        listaMaterias.clear();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject obj = response.getJSONObject(i);
+                            String nombre = obj.getString("nombre");
+                            String grado = obj.getString("grado");
+                            String seccion = obj.getString("seccion");
+
+                            listaMaterias.add(new Materia(nombre, grado, seccion));
+                        }
+                        adapter.notifyDataSetChanged();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(GestionAsistenciaActivity.this, "Error al cargar cursos", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
     }
+
 }

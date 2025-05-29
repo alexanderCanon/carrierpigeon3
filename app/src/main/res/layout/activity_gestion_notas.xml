@@ -7,6 +7,20 @@
     android:background="#F2EFE5"
     android:padding="16dp">
 
+    <TextView
+    android:id="@+id/tvTituloNotas"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="📝 Notas"
+    android:textSize="22sp"
+    android:textStyle="bold"
+    android:textColor="#333333"
+    android:layout_marginTop="12dp"
+    android:gravity="center"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
+
     <Switch
         android:id="@+id/switchMostrarTodas"
         android:layout_width="wrap_content"

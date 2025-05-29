@@ -63,9 +63,9 @@ public class GestionActividadesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion_actividades);
-
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         idUsuario = prefs.getInt("id_usuario", -1);
+
 
 
         spinnerMateria = findViewById(R.id.spinnerMateria);

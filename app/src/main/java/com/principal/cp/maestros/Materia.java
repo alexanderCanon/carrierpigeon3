@@ -25,6 +25,14 @@ public class Materia {
         return nombre + " - " + grado + " " + seccion;
     }
 
+    public int getId_asignacion() {
+        return id_asignacion;
+    }
+
+    public void setId_asignacion(int id_asignacion) {
+        this.id_asignacion = id_asignacion;
+    }
+
     public String getNombre() { return nombre; }
     public String getGrado() { return grado; }
     public String getSeccion() { return seccion; }
