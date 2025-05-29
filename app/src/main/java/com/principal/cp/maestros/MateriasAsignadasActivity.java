@@ -72,12 +72,13 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerMaterias);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new MateriaAdapter(materiasList, materia -> {
+        adapter = new MateriaAdapter(MateriasAsignadasActivity.this, materiasList, materia -> {
             Intent intent = new Intent(MateriasAsignadasActivity.this, AlumnosPorMateriaActivity.class);
             intent.putExtra("grado", materia.getGrado());
             intent.putExtra("seccion", materia.getSeccion());
             startActivity(intent);
         });
+
 
         recyclerView.setAdapter(adapter);
 
@@ -103,11 +104,13 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
                     materiasList.add(new Materia(
+                            obj.getInt("id_asignacion"),
                             obj.getString("nombre"),
                             obj.getString("grado"),
                             obj.getString("seccion")
                     ));
                 }
+
 
                 runOnUiThread(() -> adapter.notifyDataSetChanged());
 

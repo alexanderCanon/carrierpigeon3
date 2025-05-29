@@ -7,28 +7,29 @@
     android:background="#F2EFE5">
 
     <TextView
-        android:id="@+id/tvTituloNotas"
+        android:id="@+id/tvTituloAsistencia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🧑‍🎓 Alumnos"
+        android:text="📆 Asistencia"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="#333333"
+        android:textColor="#2C5C60"
         android:layout_marginTop="28dp"
-        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerAlumnos"
+    <TableLayout
+        android:id="@+id/tableLayoutAsistencia"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:stretchColumns="*"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloNotas"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloAsistencia"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="#F2EFE5"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -42,5 +43,3 @@
         app:itemIconTint="@color/bottom_nav_icon_color"
         app:itemTextColor="@color/bottom_nav_icon_color" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-

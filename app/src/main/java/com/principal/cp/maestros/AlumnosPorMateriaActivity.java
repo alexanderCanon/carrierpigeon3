@@ -63,9 +63,11 @@ public class AlumnosPorMateriaActivity extends AppCompatActivity {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
                     alumnoList.add(new Alumno(
+                            obj.getInt("id_alumno"),
                             obj.getString("nombre"),
                             obj.getString("apellido")
                     ));
+
                 }
 
                 runOnUiThread(() -> adapter.notifyDataSetChanged());
