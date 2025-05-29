@@ -42,7 +42,8 @@
             android:id="@+id/edtActividadID"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:layout_marginTop="12dp"/>
 
         <Spinner
             android:id="@+id/spinnerMateria"
@@ -50,7 +51,8 @@
             android:layout_height="48dp"
             android:background="@drawable/spinner_background"
             android:padding="12dp"
-            android:spinnerMode="dropdown"/>
+            android:spinnerMode="dropdown"
+            android:layout_marginTop="12dp"/>
 
 
         <EditText
@@ -62,7 +64,8 @@
             android:padding="12dp"
             android:textColor="#2C5C60"
             android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
+            android:background="@drawable/edittext_background"
+            android:layout_marginTop="12dp"/>
 
         <EditText
             android:id="@+id/edtDescripcion"
@@ -73,7 +76,8 @@
             android:padding="12dp"
             android:textColor="#2C5C60"
             android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
+            android:background="@drawable/edittext_background"
+            android:layout_marginTop="12dp"/>
 
         <Spinner
             android:id="@+id/spinnerTipo"
@@ -81,7 +85,8 @@
             android:layout_height="48dp"
             android:background="@drawable/spinner_background"
             android:padding="12dp"
-            android:spinnerMode="dropdown"/>
+            android:spinnerMode="dropdown"
+            android:layout_marginTop="12dp"/>
 
 
         <EditText
@@ -93,7 +98,8 @@
             android:padding="12dp"
             android:textColor="#2C5C60"
             android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
+            android:background="@drawable/edittext_background"
+            android:layout_marginTop="12dp"/>
 
         <EditText
             android:id="@+id/edtValorTotal"
@@ -104,7 +110,8 @@
             android:padding="12dp"
             android:textColor="#2C5C60"
             android:textColorHint="#7A9CA5"
-            android:background="@drawable/edittext_background"/>
+            android:background="@drawable/edittext_background"
+            android:layout_marginTop="12dp"/>
 
 
 
@@ -113,7 +120,8 @@
             android:id="@+id/btnRegistrarActividad"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Registrar Actividad" />
+            android:text="Registrar Actividad"
+            android:layout_marginTop="12dp"/>
 
         <Button
             android:id="@+id/btnEditarActividad"
@@ -149,6 +157,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="visible"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnFiltro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="90dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_filter_list"
+        android:contentDescription="Filtrar actividades"
+        app:backgroundTint="@color/bottom_nav_icon_color"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAgregarActividad"

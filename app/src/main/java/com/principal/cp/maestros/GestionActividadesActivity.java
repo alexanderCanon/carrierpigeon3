@@ -1,6 +1,10 @@
 package com.principal.cp.maestros;
 
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -25,6 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.principal.cp.R;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -38,6 +45,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -66,6 +74,31 @@ public class GestionActividadesActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         idUsuario = prefs.getInt("id_usuario", -1);
 
+        FloatingActionButton btnFiltro = findViewById(R.id.btnFiltro);
+        btnFiltro.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(this, v);
+            popup.getMenuInflater().inflate(R.menu.menu_filtro_actividades, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.filtro_fecha) {
+                    mostrarDatePicker();
+                    return true;
+                } else if (id == R.id.filtro_calificadas) {
+                    cargarActividadesFiltradas("1"); // estado = 1
+                    return true;
+                } else if (id == R.id.filtro_pendientes) {
+                    cargarActividadesFiltradas("0"); // estado = 0
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            popup.show();
+        });
+
 
 
         spinnerMateria = findViewById(R.id.spinnerMateria);
@@ -86,6 +119,10 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
         recyclerActividades = findViewById(R.id.recyclerActividades);
         recyclerActividades.setLayoutManager(new LinearLayoutManager(this));
+        listaActividades = new ArrayList<>();
+        actividadAdapter = new ActividadAdapter(listaActividades);
+        recyclerActividades.setAdapter(actividadAdapter);
+
         actividadAdapter = new ActividadAdapter(listaActividades);
         recyclerActividades.setAdapter(actividadAdapter);
 
@@ -95,9 +132,6 @@ public class GestionActividadesActivity extends AppCompatActivity {
             public void onEditarClick(Actividad actividad) {
                 mostrarFormularioEditar(actividad);
             }
-
-
-
             @Override
             public void onEliminarClick(Actividad actividad) {
                 new MaterialAlertDialogBuilder(GestionActividadesActivity.this, R.style.CustomAlertDialog)
@@ -116,9 +150,7 @@ public class GestionActividadesActivity extends AppCompatActivity {
                         .setNegativeButton("Cancelar", null)
                         .show();
             }
-
         });
-
 
         fabAgregarActividad.setOnClickListener(v -> {
             if (formularioScroll.getVisibility() == View.GONE) {
@@ -194,6 +226,124 @@ public class GestionActividadesActivity extends AppCompatActivity {
         });
         cargarActividadesEnCurso();
     }
+    private void cargarActividadesFiltradas(String estado) {
+        String url = "http://34.71.103.241/listar_actividades_por_estado.php?estado=" + estado;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        listaActividades.clear();
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            int id_actividad = obj.getInt("id_actividad");
+                            int id_asignacion = obj.getInt("id_asignacion");
+                            String titulo = obj.getString("titulo");
+                            String descripcion = obj.getString("descripcion");
+                            String tipo = obj.getString("tipo");
+                            String fecha_entrega = obj.getString("fecha_entrega");
+
+                            Actividad actividad = new Actividad(
+                                    id_actividad,
+                                    id_asignacion,
+                                    titulo,
+                                    descripcion,
+                                    tipo,
+                                    fecha_entrega
+                            );
+                            listaActividades.add(actividad);
+                        }
+
+                        actividadAdapter.notifyDataSetChanged();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "Error al procesar los datos", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> {
+                    error.printStackTrace();
+                    Toast.makeText(this, "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+                });
+
+        queue.add(stringRequest);
+    }
+
+    private void mostrarDatePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                GestionActividadesActivity.this,
+                (view, year1, month1, dayOfMonth) -> {
+                    // Formatear la fecha seleccionada
+                    String fechaSeleccionada = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, month1 + 1, dayOfMonth);
+
+                    // Llamar a método para cargar actividades por fecha
+                    cargarActividadesPorFecha(fechaSeleccionada);
+                },
+                year, month, day
+        );
+        datePickerDialog.show();
+    }
+
+
+    private void cargarActividadesPorFecha(String fecha) {
+        String url = "http://34.71.103.241/listar_actividades_por_fecha.php?fecha=" + fecha;
+
+        new AsyncTask<Void, Void, JSONArray>() {
+            @Override
+            protected JSONArray doInBackground(Void... voids) {
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    reader.close();
+                    return new JSONArray(result.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(JSONArray response) {
+                if (response != null) {
+                    listaActividades.clear();
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject obj = response.getJSONObject(i);
+                            int idActividad = obj.getInt("id_actividad");
+                            int idAsignacion = obj.getInt("id_asignacion");
+                            String titulo = obj.getString("titulo");
+                            String descripcion = obj.getString("descripcion");
+                            String tipo = obj.getString("tipo");
+                            String fechaEntrega = obj.getString("fecha_entrega");
+
+                            Actividad actividad = new Actividad(idActividad, idAsignacion, titulo, descripcion, tipo, fechaEntrega);
+                            listaActividades.add(actividad);
+                        }
+                        actividadAdapter.notifyDataSetChanged();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(GestionActividadesActivity.this, "Error al procesar datos", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(GestionActividadesActivity.this, "No hay actividades para esa fecha", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
+    }
+
+
     private void mostrarFormularioAgregar() {
         edtActividadID.setText("");
         edtTitulo.setText("");
