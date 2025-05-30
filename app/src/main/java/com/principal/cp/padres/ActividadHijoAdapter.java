@@ -32,6 +32,7 @@ public class ActividadHijoAdapter extends RecyclerView.Adapter<ActividadHijoAdap
         ActividadHijo actividad = listaActividades.get(position);
 
         holder.tvTitulo.setText(actividad.getTitulo());
+        holder.tvDescripcion.setText(actividad.getDescripcion());
         holder.tvFecha.setText("Entrega: " + actividad.getFechaEntrega());
         holder.tvEstado.setText("Estado: " + actividad.getEstado());
 
@@ -48,11 +49,12 @@ public class ActividadHijoAdapter extends RecyclerView.Adapter<ActividadHijoAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitulo, tvFecha, tvEstado, tvNota;
+        TextView tvTitulo, tvDescripcion, tvFecha, tvEstado, tvNota;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitulo = itemView.findViewById(R.id.tvTituloActividad);
+            tvDescripcion = itemView.findViewById(R.id.tvDescripcionActividad);
             tvFecha = itemView.findViewById(R.id.tvFechaEntrega);
             tvEstado = itemView.findViewById(R.id.tvEstadoActividad);
             tvNota = itemView.findViewById(R.id.tvNotaActividad);

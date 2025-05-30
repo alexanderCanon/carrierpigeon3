@@ -27,12 +27,13 @@
 
         <TextView
             android:id="@+id/tvDescripcionActividad"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Descripción breve de la actividad"
-            android:textColor="#4B4B4B"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp" />
+            android:textColor="#2C5C60"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
 
         <TextView
             android:id="@+id/tvFechaEntrega"
