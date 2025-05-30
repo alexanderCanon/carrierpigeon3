@@ -45,9 +45,13 @@ public class AlumnoNotaAdapter extends RecyclerView.Adapter<AlumnoNotaAdapter.Vi
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
                     double valorIngresado = Double.parseDouble(s.toString());
-                    if (valorIngresado > maxNota) {
+
+                    if (valorIngresado < 0) {
+                        holder.edtNota.setError("La nota no puede ser negativa");
+                        alumno.nota = ""; // no guardar si es negativa
+                    } else if (valorIngresado > maxNota) {
                         holder.edtNota.setError("La nota no puede ser mayor a " + maxNota);
-                        alumno.nota = ""; // no guardar si no es válida
+                        alumno.nota = ""; // no guardar si es inválida
                     } else {
                         holder.edtNota.setError(null);
                         alumno.nota = s.toString();
@@ -58,7 +62,8 @@ public class AlumnoNotaAdapter extends RecyclerView.Adapter<AlumnoNotaAdapter.Vi
                 }
             }
         });
-        
+
+
         holder.edtObservacion.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 alumno.observaciones = holder.edtObservacion.getText().toString();
