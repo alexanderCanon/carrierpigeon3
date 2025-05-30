@@ -32,6 +32,12 @@
         <activity android:name="com.principal.cp.maestros.GestionMaestrosActivity" android:exported="false" />
         <activity android:name="com.principal.cp.maestros.GestionNotasActivity" android:exported="false" />
 
+        <activity android:name=".padres.MateriasHijoActivity" />
+        <activity android:name=".padres.VerNotasAlumnoActivityPadre" />
+        <activity android:name=".padres.VerAsistenciaAlumnoActivityPadre" />
+        <activity android:name=".padres.ActividadesHijoActivity" />
+
+
 
         <activity
             android:name="director.AsignarMateriaWebActivity"

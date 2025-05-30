@@ -22,6 +22,7 @@ import com.android.volley.toolbox.Volley;
 import com.principal.cp.maestros.MaestroMainActivity;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.principal.cp.maestros.MateriasAsignadasActivity;
+import com.principal.cp.padres.MateriasHijoActivity;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -162,7 +163,9 @@ public class LoginActivity extends AppCompatActivity {
                                         intent.putExtra("id_usuario", idUsuario); // este viene de la base de datos
                                         break;
                                     case "padre":
-                                        intent = new Intent(LoginActivity.this, PadreMainActivity.class);
+                                        intent = new Intent(LoginActivity.this, MateriasHijoActivity.class);
+                                        intent.putExtra("id_usuario", idUsuario); // opcional si lo usas en la actividad
+
                                         break;
                                     case "director":
                                         intent = new Intent(LoginActivity.this, DirectorMainActivity.class);
