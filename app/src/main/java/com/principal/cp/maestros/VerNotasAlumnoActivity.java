@@ -1,14 +1,20 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.principal.cp.R;
 
 import org.json.JSONArray;
@@ -38,6 +44,31 @@ public class VerNotasAlumnoActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "ID de alumno no válido", Toast.LENGTH_SHORT).show();
         }
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_materias);
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_materias) {
+                    startActivity(new Intent(VerNotasAlumnoActivity.this, MateriasAsignadasActivity.class));
+                    return true;
+                } else if (id == R.id.nav_actividades) {
+                    startActivity(new Intent(VerNotasAlumnoActivity.this, GestionActividadesActivity.class));
+                    return true;
+                } else if (id == R.id.nav_notas) {
+                    startActivity(new Intent(VerNotasAlumnoActivity.this, GestionNotasActivity.class));
+                    return true;
+                } else if (id == R.id.nav_asistencia) {
+                    startActivity(new Intent(VerNotasAlumnoActivity.this, GestionAsistenciaActivity.class));
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     private void cargarNotas() {

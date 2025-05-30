@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.principal.cp.R;
 
 import org.json.JSONArray;
@@ -78,6 +79,12 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
             intent.putExtra("seccion", materia.getSeccion());
             startActivity(intent);
         });
+        FloatingActionButton btnEnviarAviso = findViewById(R.id.btnEnviarAviso);
+        btnEnviarAviso.setOnClickListener(v -> {
+            //Intent intent = new Intent(MateriasAsignadasActivity.this, EnviarAvisoAlumnosActivity.class);
+            //startActivity(intent);
+        });
+
 
 
         recyclerView.setAdapter(adapter);

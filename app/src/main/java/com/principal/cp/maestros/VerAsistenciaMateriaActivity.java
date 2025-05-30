@@ -1,15 +1,19 @@
 package com.principal.cp.maestros;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.graphics.Typeface;
+import android.view.MenuItem;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.principal.cp.R;
 
 import org.json.JSONArray;
@@ -34,6 +38,31 @@ public class VerAsistenciaMateriaActivity extends AppCompatActivity {
         tableLayoutAsistencia = findViewById(R.id.tableLayoutAsistencia);
         idAsignacion = getIntent().getIntExtra("id_asignacion", 0);
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_materias);
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_materias) {
+                    startActivity(new Intent(VerAsistenciaMateriaActivity.this, MateriasAsignadasActivity.class));
+                    return true;
+                } else if (id == R.id.nav_actividades) {
+                    startActivity(new Intent(VerAsistenciaMateriaActivity.this, GestionActividadesActivity.class));
+                    return true;
+                } else if (id == R.id.nav_notas) {
+                    startActivity(new Intent(VerAsistenciaMateriaActivity.this, GestionNotasActivity.class));
+                    return true;
+                } else if (id == R.id.nav_asistencia) {
+                    startActivity(new Intent(VerAsistenciaMateriaActivity.this, GestionAsistenciaActivity.class));
+                    return true;
+                }
+
+                return false;
+            }
+        });
         cargarAsistencia();
     }
 
