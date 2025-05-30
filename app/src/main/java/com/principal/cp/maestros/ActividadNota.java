@@ -4,11 +4,21 @@ public class ActividadNota {
     public int id_actividad;
     public String titulo;
     public String fecha_entrega;
+    public double valor_total; // ← Nuevo campo
 
-    public ActividadNota(int id_actividad, String titulo, String fecha_entrega) {
+    public ActividadNota(int id_actividad, String titulo, String fecha_entrega, double valor_total) {
         this.id_actividad = id_actividad;
         this.titulo = titulo;
         this.fecha_entrega = fecha_entrega;
+        this.valor_total = valor_total;
+    }
+
+    public double getValor_total() {
+        return valor_total;
+    }
+
+    public void setValor_total(double valor_total) {
+        this.valor_total = valor_total;
     }
 
     @Override

@@ -40,6 +40,8 @@ public class GestionNotasActivity extends AppCompatActivity {
     private AlumnoNotaAdapter alumnoNotaAdapter;
     private List<AlumnoNota> listaAlumnos = new ArrayList<>();
     private Switch switchMostrarTodas;
+    private ActividadNota actividadSeleccionada;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class GestionNotasActivity extends AppCompatActivity {
                 btnGuardarNotas.setImageResource(R.drawable.ic_save);
             }
 
-            cargarActividadesParaNotas(isChecked); // <-- ESTO es lo que faltaba
+            cargarActividadesParaNotas(isChecked);
         });
 
         btnGuardarNotas.setOnClickListener(v -> {
@@ -73,21 +75,25 @@ public class GestionNotasActivity extends AppCompatActivity {
 
 
         recyclerAlumnos.setLayoutManager(new LinearLayoutManager(this));
-        alumnoNotaAdapter = new AlumnoNotaAdapter(listaAlumnos);
-        recyclerAlumnos.setAdapter(alumnoNotaAdapter);
-
         cargarActividadesParaNotas(false);
 
         spinnerActividad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ActividadNota actividadSeleccionada = (ActividadNota) parent.getItemAtPosition(position);
-                cargarAlumnosParaActividad(actividadSeleccionada.id_actividad);
+                actividadSeleccionada = (ActividadNota) parent.getItemAtPosition(position);
+                if (actividadSeleccionada != null) {
+                    double maxNota = actividadSeleccionada.getValor_total();
+                    alumnoNotaAdapter = new AlumnoNotaAdapter(listaAlumnos, maxNota);
+                    recyclerAlumnos.setAdapter(alumnoNotaAdapter);
+
+                    cargarAlumnosParaActividad(actividadSeleccionada.getId_actividad());
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_notas);
@@ -214,7 +220,8 @@ public class GestionNotasActivity extends AppCompatActivity {
                     int id = obj.getInt("id_actividad");
                     String titulo = obj.getString("titulo");
                     String fecha = obj.getString("fecha_entrega");
-                    listaActividades.add(new ActividadNota(id, titulo, fecha));
+                    double valor = obj.getDouble("valor_total");
+                    listaActividades.add(new ActividadNota(id, titulo, fecha, valor));
                 }
 
                 runOnUiThread(() -> {
@@ -254,14 +261,15 @@ public class GestionNotasActivity extends AppCompatActivity {
                 while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
+                Log.d("DEBUG_ALUMNOS", "Respuesta JSON: " + result.toString());
 
-                JSONArray jsonArray = new JSONArray(result.toString());
+                JSONObject jsonObject = new JSONObject(result.toString());
+                JSONArray jsonArray = jsonObject.getJSONArray("alumnos");
                 List<AlumnoNota> nuevaLista = new ArrayList<>();
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
 
-                    // 🔽 AQUÍ VA LO QUE ME PREGUNTASTE 🔽
                     int id = obj.getInt("id_alumno");
                     String nombre = obj.getString("nombre");
                     String apellido = obj.getString("apellido");

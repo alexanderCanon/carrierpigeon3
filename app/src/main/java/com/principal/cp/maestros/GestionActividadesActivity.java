@@ -194,13 +194,13 @@ public class GestionActividadesActivity extends AppCompatActivity {
 
         btnEditarActividad.setOnClickListener(v -> {
             String data = getActividadData(true);
-            new ActividadTask("http://34.122.138.135/editar_actividad.php").execute(data);
+            new ActividadTask("http://34.71.103.241/editar_actividad.php").execute(data);
         });
 
         btnEliminarActividad.setOnClickListener(v -> {
             String id = edtActividadID.getText().toString();
             String data = "id_actividad=" + id;
-            new ActividadTask("http://34.122.138.135/eliminar_actividad.php").execute(data);
+            new ActividadTask("http://34.71.103.241/eliminar_actividad.php").execute(data);
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -280,16 +280,15 @@ public class GestionActividadesActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 GestionActividadesActivity.this,
                 (view, year1, month1, dayOfMonth) -> {
-                    // Formatear la fecha seleccionada
                     String fechaSeleccionada = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, month1 + 1, dayOfMonth);
-
-                    // Llamar a método para cargar actividades por fecha
+                    edtFechaEntrega.setText(fechaSeleccionada);
                     cargarActividadesPorFecha(fechaSeleccionada);
                 },
                 year, month, day
         );
         datePickerDialog.show();
     }
+
 
 
     private void cargarActividadesPorFecha(String fecha) {
@@ -408,7 +407,8 @@ public class GestionActividadesActivity extends AppCompatActivity {
             data.append("titulo=").append(URLEncoder.encode(edtTitulo.getText().toString(), "UTF-8")).append("&");
             data.append("descripcion=").append(URLEncoder.encode(edtDescripcion.getText().toString(), "UTF-8")).append("&");
             data.append("tipo=").append(URLEncoder.encode(tipo, "UTF-8")).append("&");
-            data.append("fecha_entrega=").append(URLEncoder.encode(edtFechaEntrega.getText().toString(), "UTF-8")).append("&");
+            String fecha = edtFechaEntrega.getText().toString();
+            data.append("fecha_entrega=").append(URLEncoder.encode(fecha, "UTF-8")).append("&");
             data.append("valor_total=").append(URLEncoder.encode(edtValorTotal.getText().toString(), "UTF-8")).append("&");
             data.append("grado=").append(URLEncoder.encode(gradoSeleccionado, "UTF-8")).append("&");
             data.append("seccion=").append(URLEncoder.encode(seccionSeleccionada, "UTF-8")).append("&");
@@ -579,12 +579,13 @@ public class GestionActividadesActivity extends AppCompatActivity {
         protected void onPostExecute(String resultado) {
             Toast.makeText(GestionActividadesActivity.this, resultado, Toast.LENGTH_LONG).show();
 
-            if (resultado.contains("Actividad registrada")) {
+            if (resultado.contains("Actividad registrada") || resultado.contains("Actividad actualizada")) {
                 formularioScroll.setVisibility(View.GONE);
                 recyclerActividades.setVisibility(View.VISIBLE);
-                cargarActividadesEnCurso(); // ✅ ahora sí, después del éxito
+                cargarActividadesEnCurso(); // Recargar el listado de actividades
             }
         }
+
 
     }
 

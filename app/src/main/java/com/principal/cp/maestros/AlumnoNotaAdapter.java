@@ -17,9 +17,11 @@ import java.util.List;
 public class AlumnoNotaAdapter extends RecyclerView.Adapter<AlumnoNotaAdapter.ViewHolder> {
 
     private List<AlumnoNota> listaAlumnos;
+    private double maxNota;
 
-    public AlumnoNotaAdapter(List<AlumnoNota> listaAlumnos) {
+    public AlumnoNotaAdapter(List<AlumnoNota> listaAlumnos, double maxNota) {
         this.listaAlumnos = listaAlumnos;
+        this.maxNota = maxNota;
     }
 
     @Override
@@ -35,22 +37,35 @@ public class AlumnoNotaAdapter extends RecyclerView.Adapter<AlumnoNotaAdapter.Vi
         holder.txtNombre.setText(alumno.getNombreCompleto());
 
         holder.edtNota.setText(alumno.nota);
-        holder.edtObservacion.setText(alumno.observaciones);
+        holder.edtNota.setError(null);
 
+// Evitar múltiples textwatchers
         holder.edtNota.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                alumno.nota = s.toString();
+                try {
+                    double valorIngresado = Double.parseDouble(s.toString());
+                    if (valorIngresado > maxNota) {
+                        holder.edtNota.setError("La nota no puede ser mayor a " + maxNota);
+                        alumno.nota = ""; // no guardar si no es válida
+                    } else {
+                        holder.edtNota.setError(null);
+                        alumno.nota = s.toString();
+                    }
+                } catch (NumberFormatException e) {
+                    holder.edtNota.setError("Ingrese un número válido");
+                    alumno.nota = "";
+                }
             }
         });
-
-        holder.edtObservacion.addTextChangedListener(new TextWatcherAdapter() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                alumno.observaciones = s.toString();
+        
+        holder.edtObservacion.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                alumno.observaciones = holder.edtObservacion.getText().toString();
             }
         });
     }
+
 
     @Override
     public int getItemCount() {
