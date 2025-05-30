@@ -23,8 +23,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
-import com.principal.cp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.content.Intent;
 
 public class MateriasAsignadasActivity extends AppCompatActivity {
 
@@ -63,6 +63,13 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        FloatingActionButton btnEnviarAviso = findViewById(R.id.btnEnviarAviso);
+        btnEnviarAviso.setOnClickListener(view -> {
+            Intent intent = new Intent(this, EnviarAvisoAlumnosActivity.class);
+            startActivity(intent);
+        });
+
 
 
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
