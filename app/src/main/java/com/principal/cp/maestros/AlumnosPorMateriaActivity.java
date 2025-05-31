@@ -39,6 +39,18 @@ public class AlumnosPorMateriaActivity extends AppCompatActivity {
         grado = getIntent().getStringExtra("grado");
         seccion = getIntent().getStringExtra("seccion");
 
+//        btnAviso.setOnClickListener(v -> {
+//            String grado = getIntent().getStringExtra("grado");
+//            String seccion = getIntent().getStringExtra("seccion");
+//
+//            Intent intent = new Intent(this, EnviarAvisoAlumnosActivity.class);
+//            intent.putExtra("grado", grado);
+//            intent.putExtra("seccion", seccion);
+//            startActivity(intent);
+//        });
+        //ESE BLOQUE VA A SER PARA ABRIR EL ACTIVITY DE ENVIAR AVISO ALUMNOS
+
+
         recyclerView = findViewById(R.id.recyclerAlumnos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AlumnoAdapter(alumnoList);

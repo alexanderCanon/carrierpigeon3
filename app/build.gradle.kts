@@ -41,6 +41,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.android.volley:volley:1.2.1")
     implementation ("androidx.recyclerview:recyclerview:1.3.1")
+    implementation ("androidx.cardview:cardview:1.0.0")
+    implementation ("com.google.code.gson:gson:2.10")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

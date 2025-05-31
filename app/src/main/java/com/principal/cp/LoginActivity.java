@@ -1,6 +1,10 @@
 package com.principal.cp;
 
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,31 +15,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.principal.cp.maestros.MaestroMainActivity;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.principal.cp.maestros.MateriasAsignadasActivity;
 import com.principal.cp.padres.MateriasHijoActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import director.DirectorMainActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -53,6 +51,21 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        PermisosUtil.pedirPermisoNotificaciones(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "canal_general",
+                    "Canal general",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Canal para avisos importantes");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
 
         editTextEmail = findViewById(R.id.editTextEmailLogin);
         editTextPassword = findViewById(R.id.editTextPasswordLogin);
@@ -86,10 +99,11 @@ public class LoginActivity extends AppCompatActivity {
         textViewForgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mostrarDialogoRecuperacion(); // por ejemplo
-                //startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                mostrarDialogoRecuperacion();
             }
         });
+
+
 
         //FIREBASEMESSAGING PART
         FirebaseMessaging.getInstance().getToken()
@@ -124,13 +138,27 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }).start();
                 });
+    } //FIN ONCREATE
+
+    // ✅ Aquí va el callback
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Maneja y guarda el resultado
+        PermisosUtil.manejarResultadoPermisos(requestCode, grantResults, this);
+        // ✅ Mostrar advertencia si lo rechazó
+        if (!PermisosUtil.permisoNotificacionesConcedido(this)) {
+            Toast.makeText(this, "⚠️ No recibirás avisos hasta que actives las notificaciones", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void loginUser(final String email, final String password) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_LOGIN,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+                response ->{
+
                         Log.d("LoginActivity", "Response: " + response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -138,20 +166,42 @@ public class LoginActivity extends AppCompatActivity {
                             if (!jsonObject.getBoolean("error")) {
                                 String tipo_usuario = jsonObject.getString("tipo_usuario");
                                 int idUsuario = jsonObject.getInt("id_usuario");
-                                SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-                                prefs.edit().putInt("id_usuario", idUsuario).apply();
+                                SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("id_usuario", String.valueOf(idUsuario)); // guardamos como string por compatibilidad
+                                editor.apply();
 
                                 Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
 
                                 // Guardar información del usuario en SharedPreferences
                                 editor.putBoolean("isLoggedIn", true); //para definir que ya hay una sesion activa
-                                editor.putInt("user_id", jsonObject.getInt("id_usuario"));
+                                editor.putInt("id_usuario", idUsuario);
+                                //modifiqué la linea de arriba, venia como user_id
                                 String tipoUsuario = jsonObject.getString("tipo_usuario");
                                 editor.putString("tipo_usuario", jsonObject.getString("tipo_usuario"));
                                 editor.putString("nombre", jsonObject.getString("nombre"));
                                 editor.putString("apellido", jsonObject.getString("apellido"));
                                 editor.putString("telefono", jsonObject.getString("telefono"));
                                 editor.apply();
+
+                                // Obtener token FCM y enviarlo al servidor
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                String token = task.getResult();
+                                                Log.d("FCM_TOKEN", "Token obtenido: " + token);
+                                                enviarTokenAlServidor(idUsuario, token);
+                                            } else {
+                                                Log.w("FCM_TOKEN", "No se pudo obtener token FCM", task.getException());
+                                            }
+                                        });
+
+                                // Mensaje de confirmación
+                                Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+
+                                // Redirigir según el tipo de usuario
+
+
 
                                 Intent intent;
                                 switch (tipoUsuario) {
@@ -164,8 +214,6 @@ public class LoginActivity extends AppCompatActivity {
                                         break;
                                     case "padre":
                                         intent = new Intent(LoginActivity.this, MateriasHijoActivity.class);
-                                        intent.putExtra("id_usuario", idUsuario); // opcional si lo usas en la actividad
-
                                         break;
                                     case "director":
                                         intent = new Intent(LoginActivity.this, DirectorMainActivity.class);
@@ -184,14 +232,12 @@ public class LoginActivity extends AppCompatActivity {
                             e.printStackTrace();
                             Toast.makeText(LoginActivity.this, "Error al procesar la respuesta del servidor.", Toast.LENGTH_SHORT).show();
                         }
-                    }
+                     //PILAS AAQUI TERMINA ESE ONRESPONSE
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                error ->{
                         Log.e("LoginActivity", "Error: " + error.getMessage());
                         Toast.makeText(LoginActivity.this, "Error de conexión.", Toast.LENGTH_SHORT).show();
-                    }
+
                 }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -203,6 +249,27 @@ public class LoginActivity extends AppCompatActivity {
         };
         requestQueue.add(stringRequest);
     }
+
+    public void enviarTokenAlServidor(int idUsuario, String token) {
+        String url = "http://34.71.103.241/actualizar_token.php";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                response -> Log.d("FCM_TOKEN", "Respuesta del servidor: " + response),
+
+                error -> Log.e("FCM_TOKEN", "Error al enviar token", error)
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_usuario", String.valueOf(idUsuario));
+                params.put("token", token);
+                return params;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(request);
+    }
+
 
     private void redirectToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);

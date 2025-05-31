@@ -17,7 +17,11 @@
         <EditText android:id="@+id/editEmail" android:hint="Email" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <EditText android:id="@+id/editGrado" android:hint="Grado" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <EditText android:id="@+id/editSeccion" android:hint="Sección" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/editPadreID" android:hint="ID Usuario Padre" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spinnerPadres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </ScrollView>

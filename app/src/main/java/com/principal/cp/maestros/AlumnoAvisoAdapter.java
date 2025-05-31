@@ -61,4 +61,3 @@ public class AlumnoAvisoAdapter extends RecyclerView.Adapter<AlumnoAvisoAdapter.
         return ids;
     }
 }
-

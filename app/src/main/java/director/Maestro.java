@@ -1,7 +1,6 @@
-package com.principal.cp.maestros;
-
+package director;
 public class Maestro {
-    private int id_usuario;
+    private int idUsuario;
     private String nombre;
     private String apellido;
     private String email;
@@ -9,8 +8,8 @@ public class Maestro {
     private String dpi;
     private String estado;
 
-    public Maestro(int id_usuario, String nombre, String apellido, String email, String telefono, String dpi, String estado) {
-        this.id_usuario = id_usuario;
+    public Maestro(int idUsuario, String nombre, String apellido, String email, String telefono, String dpi, String estado) {
+        this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -20,7 +19,7 @@ public class Maestro {
     }
 
     public int getIdUsuario() {
-        return id_usuario;
+        return idUsuario;
     }
 
     public String getNombre() {
@@ -45,26 +44,6 @@ public class Maestro {
 
     public String getEstado() {
         return estado;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public void setDpi(String dpi) {
-        this.dpi = dpi;
     }
 
     public void setEstado(String estado) {

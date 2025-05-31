@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F2EFE5">
+
+    <EditText
+        android:id="@+id/edtGrado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Grado (Ej: Primero Básico)"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#2C5C60"
+        android:textColorHint="#91BBA3" />
+
+    <EditText
+        android:id="@+id/edtSeccion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Sección (Ej: A)"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#2C5C60"
+        android:textColorHint="#91BBA3" />
+
+    <Button
+        android:id="@+id/btnBuscar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buscar Maestros"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#FFFFFF" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMaestros"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btnSiguiente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Siguiente"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#FFFFFF" />
+</LinearLayout>
