@@ -36,25 +36,15 @@
             android:name=".maestros.GestionNotasActivity"
             android:exported="false" />
         <activity android:name="com.principal.cp.maestros.VerAsistenciaAlumnoActivity"/>
-        <activity android:name="com.principal.cp.maestros.EnviarAvisoAlumnosActivity"/>
         <activity android:name="com.principal.cp.maestros.VerNotasAlumnoActivity"/>
         <activity android:name="com.principal.cp.maestros.VerNotasMateriaActivity" />
         <activity android:name="com.principal.cp.maestros.VerAsistenciaMateriaActivity" />
         <activity android:name="com.principal.cp.maestros.RegistrarAsistenciaActivity" />
         <activity android:name="com.principal.cp.maestros.EditarAsistenciaActivity" />
-        <activity android:name="com.principal.cp.maestros.GestionActividadesActivity" android:exported="false" />
-
-        <activity android:name="com.principal.cp.maestros.GestionAsistenciaActivity" android:exported="false" />
-        <activity android:name="com.principal.cp.maestros.GestionMaestrosActivity" android:exported="false" />
-        <activity android:name="com.principal.cp.maestros.GestionNotasActivity" android:exported="false" />
-
         <activity android:name=".padres.MateriasHijoActivity" />
         <activity android:name=".padres.VerNotasAlumnoActivityPadre" />
         <activity android:name=".padres.VerAsistenciaAlumnoActivityPadre" />
         <activity android:name=".padres.ActividadesHijoActivity" />
-
-
-
         <activity
             android:name="director.AsignarMateriaWebActivity"
             android:exported="false" />
