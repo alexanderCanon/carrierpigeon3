@@ -33,32 +33,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"/>
 
+    <!-- Hotbar inferior -->
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnEnviarAviso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
-        android:layout_marginEnd="20dp"
-        android:contentDescription="Enviar Aviso"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Enviar aviso"
         android:src="@drawable/ic_send"
         app:backgroundTint="#2C5C60"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <!-- Hotbar inferior -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#F2EFE5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/bottom_nav_icon_color"
         app:itemTextColor="@color/bottom_nav_icon_color"
-        app:labelVisibilityMode="labeled" />
-
-
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu_bottom_nav" />
 </androidx.constraintlayout.widget.ConstraintLayout>

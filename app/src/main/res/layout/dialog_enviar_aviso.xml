@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edtAsunto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Asunto"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#2C5C60"
+        android:textColorHint="#91BBA3" />
+
+    <EditText
+        android:id="@+id/edtMensaje"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mensaje"
+        android:minLines="4"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#2C5C60"
+        android:textColor="#2C5C60"
+        android:textColorHint="#91BBA3" />
+</LinearLayout>
