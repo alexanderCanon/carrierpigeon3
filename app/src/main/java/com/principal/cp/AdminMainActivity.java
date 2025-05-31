@@ -13,15 +13,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class AdminMainActivity extends AppCompatActivity {
     private Button buttonLogout;
-    private SharedPreferences sharedPreferences; //nos permite guardar datos en el dispositivo para la sesión activa
+    private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    private Button botonParaSexo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_main); // Reemplaza con tu layout
-        //aquí para abajo es el bloque del boton para cerrar sesión
+        setContentView(R.layout.activity_admin_main);
         buttonLogout = findViewById(R.id.buttonLogout);
         sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -41,7 +39,7 @@ public class AdminMainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }); //aquí termina el bloque del boton para cerrar sesión
+        });
     }
 
 
