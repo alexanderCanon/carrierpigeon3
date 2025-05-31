@@ -86,11 +86,11 @@ public class MateriasAsignadasActivity extends AppCompatActivity {
             intent.putExtra("seccion", materia.getSeccion());
             startActivity(intent);
         });
-        FloatingActionButton btnEnviarAviso = findViewById(R.id.btnEnviarAviso);
+        /*FloatingActionButton btnEnviarAviso = findViewById(R.id.btnEnviarAviso);
         btnEnviarAviso.setOnClickListener(v -> {
             //Intent intent = new Intent(MateriasAsignadasActivity.this, EnviarAvisoAlumnosActivity.class);
             //startActivity(intent);
-        });
+        });*/
 
 
 
