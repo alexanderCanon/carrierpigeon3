@@ -1,60 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="#F2EFE5"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/edtAlumnoID"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="ID del Alumno" />
+    <TextView
+    android:id="@+id/tvTituloNotas"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="📝 Notas"
+    android:textSize="22sp"
+    android:textStyle="bold"
+    android:textColor="#333333"
+    android:layout_marginTop="12dp"
+    android:gravity="center"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/edtActividadID"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="ID Actividad" />
-
-    <EditText
-        android:id="@+id/edtNota"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:hint="Nota"
-    android:inputType="numberDecimal" />
-
-    <EditText
-        android:id="@+id/edtObservaciones"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Observaciones"
-        android:inputType="numberDecimal" />
-
-    <Button
-        android:id="@+id/btnRegistrarNota"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:text="Registrar Nota" />
-
-    <Button
-        android:id="@+id/btnActualizarNota"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:text="Actualizar Nota" />
-
-    <Button
-        android:id="@+id/btnEliminarNota"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-    android:text="Eliminar Nota" />
-    <Button
-        android:id="@+id/btnVolverMaestros"
-        android:layout_width="match_parent"
+    <Switch
+        android:id="@+id/switchMostrarTodas"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Volver a menú de maestro"
-        android:layout_marginTop="16dp" />
+        android:text="Mostrar solo las actividades ya calificadas"
+        android:textColor="@android:color/black"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+    <Spinner
+        android:id="@+id/spinnerActividad"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/switchMostrarTodas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerAlumnos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/spinnerActividad"
+        app:layout_constraintBottom_toTopOf="@id/btnGuardarNotas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnGuardarNotas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Guardar Notas"
+        android:src="@drawable/ic_save"
+    android:tint="@android:color/white"
+    android:backgroundTint="#4CAF50"
+    app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginBottom="16dp"
+    android:layout_marginEnd="16dp" />
 
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#F2EFE5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/menu_bottom_nav"
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemTextColor="@color/bottom_nav_icon_color" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

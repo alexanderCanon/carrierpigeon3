@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_ver_alumnos" android:title="Ver alumnos" />
+    <item android:id="@+id/menu_ver_notas" android:title="Ver notas" />
+    <item android:id="@+id/menu_ver_asistencia" android:title="Ver asistencia" />
+</menu>

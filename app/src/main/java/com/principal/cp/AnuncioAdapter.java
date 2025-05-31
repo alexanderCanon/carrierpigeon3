@@ -25,7 +25,6 @@ public void onBindViewHolder(@NonNull AnuncioViewHolder holder, int position) {
     AnuncioPrueba anuncio = anuncios.get(position);
     holder.tituloTextView.setText(anuncio.getTitulo());
     holder.contenidoTextView.setText(anuncio.getContenido());
-    // Puedes formatear la fecha si lo deseas
 }
 
 @Override

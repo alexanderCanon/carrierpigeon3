@@ -55,7 +55,7 @@ public class EnviarAvisoAlumnosActivity extends AppCompatActivity {
         adapter = new AlumnoAvisoAdapter(listaAlumnos);
         recyclerView.setAdapter(adapter);
 
-        SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         idMaestro = prefs.getInt("id_usuario", -1);
 
         cargarAlumnos();

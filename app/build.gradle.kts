@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation("com.prolificinteractive:material-calendarview:1.4.3")
     implementation ("com.google.firebase:firebase-messaging:23.0.0")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-analytics")

@@ -1,10 +1,13 @@
 package com.principal.cp.maestros;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.principal.cp.R;
@@ -29,6 +32,28 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Alumno a = lista.get(position);
         holder.txtNombre.setText(a.getNombre() + " " + a.getApellido());
+
+        holder.btnOpciones.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(v.getContext(), holder.btnOpciones);
+            popup.inflate(R.menu.menu_opciones_alumno);
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_ver_notas_alumno) {
+                    Intent intent = new Intent(v.getContext(), VerNotasAlumnoActivity.class);
+                    intent.putExtra("id_alumno", a.getId());
+                    v.getContext().startActivity(intent);
+                    return true;
+                } else if (itemId == R.id.menu_ver_asistencia_alumno) {
+                    Intent intent = new Intent(v.getContext(), VerAsistenciaAlumnoActivity.class);
+                    intent.putExtra("id_alumno", a.getId());
+                    v.getContext().startActivity(intent);
+                    return true;
+                }
+                return false;
+            });
+            popup.show();
+        });
+
     }
 
     @Override
@@ -38,10 +63,13 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtNombre;
+        ImageButton btnOpciones;
 
         ViewHolder(View itemView) {
             super(itemView);
             txtNombre = itemView.findViewById(R.id.txtNombreAlumno);
+            btnOpciones = itemView.findViewById(R.id.btnOpcionesAlumno);
         }
     }
+
 }

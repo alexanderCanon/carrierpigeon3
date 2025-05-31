@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filtro_fecha"
+        android:title="Filtrar por fecha" />
+    <item
+        android:id="@+id/filtro_calificadas"
+        android:title="Solo calificadas" />
+    <item
+        android:id="@+id/filtro_pendientes"
+        android:title="Solo pendientes de calificar" />
+</menu>

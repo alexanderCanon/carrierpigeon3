@@ -1,6 +1,5 @@
 package com.principal.cp;
 
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
@@ -22,10 +21,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.principal.cp.maestros.MateriasAsignadasActivity;
+import com.principal.cp.padres.MateriasHijoActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,11 +37,14 @@ import director.DirectorMainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText editTextEmail, editTextPassword; private Button buttonLogin; private TextView textViewForgotPass;
+    private EditText editTextEmail, editTextPassword;
+    private Button buttonLogin;
+    private TextView textViewForgotPass;
     private RequestQueue requestQueue;
     private static final String URL_LOGIN = "http://34.71.103.241/login_usuario.php"; // Reemplaza
     private static final String TAG = "MainActivity";
-    private SharedPreferences sharedPreferences; private SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +102,41 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+
+
+        //FIREBASEMESSAGING PART
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Error al obtener el token", task.getException());
+                        return;
+                    }
+
+                    // Token obtenido
+                    String token = task.getResult();
+                    Log.d(TAG, "Token FCM: " + token);
+
+                    // Enviar el token al servidor
+                    new Thread(() -> {
+                        try {
+                            URL url = new URL("http://34.71.103.241/save_token.php"); // CAMBIA esto por tu URL real
+                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Content-Type", "application/json");
+                            conn.setDoOutput(true);
+
+                            String jsonInput = "{\"token\":\"" + token + "\"}";
+                            OutputStream os = conn.getOutputStream();
+                            os.write(jsonInput.getBytes("UTF-8"));
+                            os.close();
+
+                            int responseCode = conn.getResponseCode();
+                            Log.d(TAG, "Respuesta del servidor: " + responseCode);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                });
     } //FIN ONCREATE
 
     // ✅ Aquí va el callback
@@ -114,80 +156,88 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginUser(final String email, final String password) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_LOGIN,
-                response -> {
-                    Log.d("LoginActivity", "Response: " + response);
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
+                response ->{
 
-                        if (!jsonObject.getBoolean("error")) {
-                            // Extraer datos del JSON
-                            int idUsuario = jsonObject.getInt("id_usuario");
-                            String tipoUsuario = jsonObject.getString("tipo_usuario");
+                        Log.d("LoginActivity", "Response: " + response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
 
-                            // Guardar en SharedPreferences
-                            SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putInt("id_usuario", idUsuario);
-                            editor.putBoolean("isLoggedIn", true);
-                            editor.putString("tipo_usuario", tipoUsuario);
-                            editor.putString("nombre", jsonObject.getString("nombre"));
-                            editor.putString("apellido", jsonObject.getString("apellido"));
-                            editor.putString("telefono", jsonObject.getString("telefono"));
-                            editor.apply();
+                            if (!jsonObject.getBoolean("error")) {
+                                String tipo_usuario = jsonObject.getString("tipo_usuario");
+                                int idUsuario = jsonObject.getInt("id_usuario");
+                                SharedPreferences prefs = getSharedPreferences("sesion", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("id_usuario", String.valueOf(idUsuario)); // guardamos como string por compatibilidad
+                                editor.apply();
 
-                            // Obtener token FCM y enviarlo al servidor
-                            FirebaseMessaging.getInstance().getToken()
-                                    .addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            String token = task.getResult();
-                                            Log.d("FCM_TOKEN", "Token obtenido: " + token);
-                                            enviarTokenAlServidor(idUsuario, token);
-                                        } else {
-                                            Log.w("FCM_TOKEN", "No se pudo obtener token FCM", task.getException());
-                                        }
-                                    });
+                                Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
 
-                            // Mensaje de confirmación
-                            Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                                // Guardar información del usuario en SharedPreferences
+                                editor.putBoolean("isLoggedIn", true); //para definir que ya hay una sesion activa
+                                editor.putInt("id_usuario", idUsuario);
+                                //modifiqué la linea de arriba, venia como user_id
+                                String tipoUsuario = jsonObject.getString("tipo_usuario");
+                                editor.putString("tipo_usuario", jsonObject.getString("tipo_usuario"));
+                                editor.putString("nombre", jsonObject.getString("nombre"));
+                                editor.putString("apellido", jsonObject.getString("apellido"));
+                                editor.putString("telefono", jsonObject.getString("telefono"));
+                                editor.apply();
 
-                            // Redirigir según el tipo de usuario
-                            Intent intent;
-                            switch (tipoUsuario) {
-                                case "admin":
-                                    intent = new Intent(LoginActivity.this, AdminMainActivity.class);
-                                    break;
-                                case "maestro":
-                                    intent = new Intent(LoginActivity.this, MateriasAsignadasActivity.class);
-                                    intent.putExtra("id_usuario", idUsuario); // Enviar también por extra si lo necesitas
-                                    break;
-                                case "padre":
-                                    intent = new Intent(LoginActivity.this, PadreMainActivity.class);
-                                    break;
-                                case "director":
-                                    intent = new Intent(LoginActivity.this, DirectorMainActivity.class);
-                                    break;
-                                default:
-                                    intent = new Intent(LoginActivity.this, MainActivity.class); // Fallback
-                                    break;
+                                // Obtener token FCM y enviarlo al servidor
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                String token = task.getResult();
+                                                Log.d("FCM_TOKEN", "Token obtenido: " + token);
+                                                enviarTokenAlServidor(idUsuario, token);
+                                            } else {
+                                                Log.w("FCM_TOKEN", "No se pudo obtener token FCM", task.getException());
+                                            }
+                                        });
+
+                                // Mensaje de confirmación
+                                Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+
+                                // Redirigir según el tipo de usuario
+
+
+
+                                Intent intent;
+                                switch (tipoUsuario) {
+                                    case "admin":
+                                        intent = new Intent(LoginActivity.this, AdminMainActivity.class);
+                                        break;
+                                    case "maestro":
+                                        intent = new Intent(LoginActivity.this, MateriasAsignadasActivity.class);
+                                        intent.putExtra("id_usuario", idUsuario); // este viene de la base de datos
+                                        break;
+                                    case "padre":
+                                        intent = new Intent(LoginActivity.this, MateriasHijoActivity.class);
+                                        break;
+                                    case "director":
+                                        intent = new Intent(LoginActivity.this, DirectorMainActivity.class);
+                                        break;
+                                    default:
+                                        intent = new Intent(LoginActivity.this, MainActivity.class); // Fallback
+                                        break;
+                                }
+                                startActivity(intent);
+                                finish(); // Cerrar la actividad de login
                             }
-
-                            startActivity(intent);
-                            finish(); // cerrar LoginActivity
-
-                        } else {
-                            Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                             else {
+                                Toast.makeText(LoginActivity.this, jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(LoginActivity.this, "Error al procesar la respuesta del servidor.", Toast.LENGTH_SHORT).show();
                         }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(LoginActivity.this, "Error al procesar la respuesta del servidor.", Toast.LENGTH_SHORT).show();
-                    }
+                     //PILAS AAQUI TERMINA ESE ONRESPONSE
                 },
-                error -> {
-                    Log.e("LoginActivity", "Error: " + error.getMessage());
-                    Toast.makeText(LoginActivity.this, "Error de conexión.", Toast.LENGTH_SHORT).show();
-                }) {
+                error ->{
+                        Log.e("LoginActivity", "Error: " + error.getMessage());
+                        Toast.makeText(LoginActivity.this, "Error de conexión.", Toast.LENGTH_SHORT).show();
 
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -196,7 +246,6 @@ public class LoginActivity extends AppCompatActivity {
                 return params;
             }
         };
-
         requestQueue.add(stringRequest);
     }
 
@@ -219,6 +268,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Volley.newRequestQueue(this).add(request);
     }
+
 
     private void redirectToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);

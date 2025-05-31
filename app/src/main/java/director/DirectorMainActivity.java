@@ -73,6 +73,11 @@ public class DirectorMainActivity extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             }
+             else if(id == R.id.nav_materias){
+                startActivity(new Intent(this, GestionMateriasActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
 
             return false;
         });

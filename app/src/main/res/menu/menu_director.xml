@@ -12,4 +12,9 @@
         android:id="@+id/nav_maestros"
         android:icon="@drawable/ic_maestro"
         android:title="Maestros" />
+
+    <item
+        android:id="@+id/nav_materias"
+        android:icon="@drawable/ic_materia"
+        android:title="Materias" />
 </menu>
